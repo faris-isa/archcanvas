@@ -2,10 +2,10 @@
 
 ## TL;DR
 
-> **Quick Summary**: Build ArchCanvas — a React Flow canvas tool where users drag agnostic pipeline nodes, set intent properties, and get AI-recommended transport protocols via Gemini. pnpm monorepo (Vite+ frontend + Hono backend), SQLite persistence, TDD throughout.
+> **Quick Summary**: Build ArchCanvas — a React Flow canvas tool where users drag agnostic pipeline nodes, set intent properties, and get AI-recommended transport protocols via Gemini. Vite+ monorepo (apps/web uses `vp` toolchain + Vitest, apps/api uses Bun + `vp test run`), SQLite persistence, TDD throughout.
 >
 > **Deliverables**:
-> - Monorepo scaffold (pnpm workspace with apps/web and apps/api)
+> - Monorepo scaffold (Vite+ workspace with apps/web and apps/api)
 > - React Flow drag-and-drop canvas with 3 node categories (7-8 node types)
 > - Intent property editing per node (4 properties: throughput-rate, environment, latency-tolerance, network-reliability)
 > - Hono API backend with Gemini integration + mock mode
@@ -72,7 +72,7 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 - [ ] User can click "Analyze" and see AI-recommended protocols per edge
 - [ ] Mock mode works without Gemini API key
 - [ ] User can save/load pipeline designs via sidebar
-- [ ] All tests pass (`bun test` in both apps)
+- [ ] All tests pass (`vp test` in both apps)
 - [ ] Dark tech-industrial UI theme applied throughout
 
 ### Must Have
@@ -106,7 +106,9 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 ### Test Decision
 - **Infrastructure exists**: NO (greenfield — scaffold from scratch)
 - **Automated tests**: TDD (red-green-refactor)
-- **Framework**: `bun test` for both frontend and backend
+- **Framework**: **Vitest via `vp test`** for both frontend and backend (Vite+ unified toolchain)
+- **Configuration**: Both `apps/web/vite.config.ts` and `apps/api/vite.config.ts` have `test` blocks
+- **Running tests**: `vp test run` from each app, or `vp run -r test` from root for all
 - **TDD flow**: Each task follows RED (write failing test) → GREEN (minimal impl) → REFACTOR
 
 ### QA Policy
@@ -197,17 +199,17 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 - [ ] 1. Monorepo scaffold + dev tooling
 
   **What to do**:
-  - Initialize pnpm workspace with `pnpm-workspace.yaml` pointing to `apps/*`
+  - Initialize Vite+ monorepo structure with workspace config for `apps/*`
   - Scaffold `apps/web` with VitePlus React TypeScript template
   - Scaffold `apps/api` with Hono Node.js template
-  - Install root dev dependencies: `concurrently`, `typescript`
+  - Install root dev dependencies: `typescript`
   - Install web dependencies: `@xyflow/react`, `zustand`, `lucide-react`, `tailwindcss`, `postcss`, `autoprefixer`
   - Install api dependencies: `@hono/node-server`, `@google/genai`, `drizzle-orm`, `better-sqlite3`, `drizzle-kit`
   - Configure `tailwind.config.ts` with dark theme base colors
   - Configure Vite proxy: `/api` → `http://localhost:3000`
-  - Add root `package.json` scripts: `"dev": "concurrently \"pnpm -F web dev\" \"pnpm -F api dev\""`
-  - Add `bun test` config to both `apps/web` and `apps/api`
-  - Ensure `pnpm install` and `pnpm dev` both work from root
+  - Add root `package.json` scripts: `"dev": "vp run -r dev"`, `"test": "vp run -r test"`
+  - Configure `test` block in both `apps/web/vite.config.ts` and `apps/api/vite.config.ts`
+  - Ensure `vp install` and `vp run -r dev` both work from root
 
   **Must NOT do**:
   - NO shared types package yet (that's Task 5)
@@ -227,23 +229,23 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **References**:
   - User's plan Phase 0 commands — monorepo init, VitePlus scaffold, Hono scaffold, proxy config
   - Vite proxy: `https://vitejs.dev/config/server-options.html#server-proxy`
-  - pnpm workspaces: `https://pnpm.io/workspaces`
+  - pnpm workspaces: `https://vite-plus.dev/guide/monorepo`
 
   **Acceptance Criteria**:
-  - [ ] `pnpm install` succeeds from root with zero errors
-  - [ ] `pnpm dev` starts both web (port 5173) and api (port 3000) concurrently
+  - [ ] `vp install` succeeds from root with zero errors
+  - [ ] `vp run -r dev` starts both web (port 5173) and api (port 3000) concurrently
   - [ ] `apps/web/vite.config.ts` contains proxy for `/api` → `http://localhost:3000`
-  - [ ] Both apps have `bun test` configured
+  - [ ] Both apps have `vp test run` configured
 
   **QA Scenarios**:
   ```
   Scenario: Monorepo installs and starts
     Tool: Bash
-    Preconditions: Fresh clone, Node.js and pnpm installed
+    Preconditions: Fresh clone, Node.js and vp installed
     Steps:
-      1. Run `pnpm install` from project root
+      1. Run `vp install` from project root
       2. Assert exit code 0
-      3. Run `pnpm dev` from project root
+      3. Run `vp run -r dev` from project root
       4. Wait 5 seconds
       5. Curl `http://localhost:5173` — assert 200
       6. Curl `http://localhost:3000/api/health` — assert 200
@@ -260,12 +262,24 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
     Expected Result: Vite proxy successfully forwards /api requests to Hono
     Failure Indicators: 404, 502, or CORS error on proxied request
     Evidence: .sisyphus/evidence/task-1-proxy-test.txt
+
+  Scenario: Vitest (vp test) runs in both apps
+    Tool: Bash
+    Preconditions: Both apps scaffolded
+    Steps:
+      1. `cd apps/web && vp test run`
+      2. Assert exit code 0 (no test files yet, but Vitest initializes)
+      3. `cd apps/api && vp test run`
+      4. Assert exit code 0
+    Expected Result: Vitest initializes in both apps without errors
+    Failure Indicators: Config errors, missing dependencies, Vitest not found
+    Evidence: .sisyphus/evidence/task-1-vp-test.txt
   ```
 
   **Commit**: YES
-  - Message: `feat(scaffold): initialize pnpm monorepo with apps/web and apps/api`
+  - Message: `feat(scaffold): initialize Vite+ monorepo with vp test and vp dev`
   - Files: Root config, `apps/web/`, `apps/api/`
-  - Pre-commit: `pnpm install && pnpm build`
+  - Pre-commit: `vp install && vp test run`
 
 ---
 
@@ -277,7 +291,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Implement health endpoint in `apps/api/src/routes/health.ts`
   - Wire up in `apps/api/src/index.ts` (server entry with `@hono/node-server`)
   - Add CORS middleware, logger middleware, error handling middleware returning `{ error: string, status: number }`
-  - Ensure `bun test apps/api` passes
+  - Ensure `vp test run` (from apps/api) passes
 
   **Must NOT do**:
   - NO pipeline endpoints (Task 8), NO Gemini logic (Task 9), NO database logic (Task 3)
@@ -298,7 +312,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **Acceptance Criteria**:
   - [ ] `GET /api/health` returns `{ "status": "ok", "timestamp": "<ISO string>" }`
-  - [ ] `bun test apps/api` passes
+  - [ ] `vp test run` (from apps/api) passes
   - [ ] CORS and logger middleware configured
   - [ ] Error handler returns structured JSON for unhandled routes
 
@@ -326,7 +340,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(api): add Hono skeleton with health endpoint`
   - Files: `apps/api/src/**`
-  - Pre-commit: `cd apps/api && bun test`
+  - Pre-commit: `cd apps/api && vp test run`
 
 ---
 
@@ -360,16 +374,16 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Acceptance Criteria**:
   - [ ] `pipelines` table schema defined with all columns
   - [ ] `canvas_state` is TEXT column storing serialized JSON
-  - [ ] `bun test apps/api` passes with CRUD tests
-  - [ ] `npx drizzle-kit generate` creates migration files
-  - [ ] `npx drizzle-kit push` applies schema to SQLite
+  - [ ] `vp test run` (from apps/api) passes with CRUD tests
+  - [ ] `vp drizzle-kit generate` creates migration files
+  - [ ] `vp drizzle-kit push` applies schema to SQLite
 
   **QA Scenarios**:
   ```
   Scenario: Pipeline CRUD operations work
-    Tool: Bash (bun test)
+    Tool: Bash (vp test run)
     Steps:
-      1. Run `bun test apps/api` — pipeline schema tests
+      1. Run `vp test run` (from apps/api) — pipeline schema tests
       2. Assert create/read/delete all pass
       3. Verify canvas_state round-trips with JSON parse/stringify
     Expected Result: All CRUD operations pass their tests
@@ -379,7 +393,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(api): add Drizzle ORM + pipeline schema + migrations`
   - Files: `apps/api/src/db/**`, `apps/api/drizzle.config.ts`
-  - Pre-commit: `cd apps/api && bun test`
+  - Pre-commit: `cd apps/api && vp test run`
 
 ---
 
@@ -424,9 +438,9 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **QA Scenarios**:
   ```
   Scenario: Store actions modify state correctly
-    Tool: Bash (bun test)
+    Tool: Bash (vp test run)
     Steps:
-      1. Run `bun test apps/web` — store tests
+      1. Run `vp test run` (from apps/web) — store tests
       2. Assert addNode/removeNode/updateNodeData work
       3. Assert immutability: new references after updates
     Expected Result: All store actions pass with correct state transitions
@@ -436,7 +450,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(web): add Zustand canvas store + shared types`
   - Files: `apps/web/src/store/**`, `apps/web/src/types/**`
-  - Pre-commit: `cd apps/web && bun test`
+  - Pre-commit: `cd apps/web && vp test run`
 
 ---
 
@@ -466,11 +480,11 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - **Blocked By**: 1
 
   **References**:
-  - pnpm workspace protocol: `https://pnpm.io/workspaces#workspace-protocol-workspace`
+  - pnpm workspace protocol: `https://vite-plus.dev/guide/monorepo`
 
   **Acceptance Criteria**:
   - [ ] Both apps can `import { AnalyzeRequest } from '@archcanvas/shared'`
-  - [ ] `pnpm install` succeeds with workspace linking
+  - [ ] `vp install` succeeds with workspace linking
   - [ ] TypeScript compilation succeeds in both apps
 
   **QA Scenarios**:
@@ -478,7 +492,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   Scenario: Shared types importable from both apps
     Tool: Bash
     Steps:
-      1. `pnpm install` — assert success
+      1. `vp install` — assert success
       2. `tsc --noEmit` in both apps — assert zero errors
     Expected Result: Both apps compile with shared type imports
     Evidence: .sisyphus/evidence/task-5-shared-types.txt
@@ -486,8 +500,8 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **Commit**: YES
   - Message: `feat(shared): add shared types package for API contracts`
-  - Files: `packages/shared/**`, root `pnpm-workspace.yaml` update
-  - Pre-commit: `pnpm install && pnpm build`
+  - Files: `packages/shared/**`, root workspace config update
+  - Pre-commit: `vp install && vp build`
 
 ---
 
@@ -544,7 +558,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(web): add React Flow canvas with drag-and-drop sidebar`
   - Files: `apps/web/src/components/canvas/**`, `sidebar/**`, `layout/**`
-  - Pre-commit: `cd apps/web && bun test`
+  - Pre-commit: `cd apps/web && vp test run`
 
 ---
 
@@ -599,7 +613,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(web): add IntentNode custom component with property editing`
   - Files: `apps/web/src/components/nodes/**`
-  - Pre-commit: `cd apps/web && bun test`
+  - Pre-commit: `cd apps/web && vp test run`
 
 ---
 
@@ -637,7 +651,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] `POST` returns 201 with generated ID
   - [ ] `GET` missing ID returns 404
   - [ ] `POST` with invalid body returns 400
-  - [ ] `bun test apps/api` passes
+  - [ ] `vp test run` (from apps/api) passes
 
   **QA Scenarios**:
   ```
@@ -657,7 +671,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(api): add pipeline CRUD endpoints`
   - Files: `apps/api/src/routes/pipelines.ts`
-  - Pre-commit: `cd apps/api && bun test`
+  - Pre-commit: `cd apps/api && vp test run`
 
 ---
 
@@ -698,12 +712,12 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] `MockAnalysisService` returns realistic hardcoded responses per category pair
   - [ ] Factory returns correct service based on env var
   - [ ] Gemini uses structured output configuration
-  - [ ] `bun test apps/api` passes
+  - [ ] `vp test run` (from apps/api) passes
 
   **QA Scenarios**:
   ```
   Scenario: Mock service returns correct protocols
-    Tool: Bash (bun test)
+    Tool: Bash (vp test run)
     Steps:
       1. Call mockAnalysisService with sample edges
       2. Assert each edge has valid protocol (MQTT/OPC UA/gRPC/Kafka)
@@ -715,7 +729,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(api): add Gemini service + mock service`
   - Files: `apps/api/src/services/**`
-  - Pre-commit: `cd apps/api && bun test`
+  - Pre-commit: `cd apps/api && vp test run`
 
 ---
 
@@ -767,7 +781,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(api): add /api/analyze-architecture endpoint`
   - Files: `apps/api/src/routes/analyze.ts`
-  - Pre-commit: `cd apps/api && bun test`
+  - Pre-commit: `cd apps/api && vp test run`
 
 ---
 
@@ -821,7 +835,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(web): add edge protocol labels + analysis trigger UI`
   - Files: `apps/web/src/components/canvas/**`
-  - Pre-commit: `cd apps/web && bun test`
+  - Pre-commit: `cd apps/web && vp test run`
 
 ---
 
@@ -875,7 +889,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(web): add save/load pipeline UX`
   - Files: `apps/web/src/components/sidebar/**`
-  - Pre-commit: `cd apps/web && bun test`
+  - Pre-commit: `cd apps/web && vp test run`
 
 ---
 
@@ -909,12 +923,12 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Relative paths used (no hardcoded base URL)
   - [ ] Typed errors with status and message
   - [ ] Tasks 11 and 12 refactored to use client
-  - [ ] `bun test apps/web` passes
+  - [ ] `vp test run` (from apps/web) passes
 
   **QA Scenarios**:
   ```
   Scenario: API client functions work
-    Tool: Bash (bun test)
+    Tool: Bash (vp test run)
     Steps:
       1. Run client tests — assert all functions return correct types
       2. Assert error handling throws typed errors
@@ -925,7 +939,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(web): add frontend API client + integration`
   - Files: `apps/web/src/api/**`, `apps/web/src/components/**` (refactored)
-  - Pre-commit: `cd apps/web && bun test`
+  - Pre-commit: `cd apps/web && vp test run`
 
 ---
 
@@ -981,7 +995,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(web): apply dark tech-industrial theme`
   - Files: `apps/web/src/styles/**`, `tailwind.config.*`, component files
-  - Pre-commit: `cd apps/web && bun test`
+  - Pre-commit: `cd apps/web && vp test run`
 
 ---
 
@@ -1035,7 +1049,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `feat(e2e): end-to-end flow integration`
   - Files: `apps/web/tests/e2e/**`, `apps/api/tests/e2e/**`
-  - Pre-commit: `bun test`
+  - Pre-commit: `vp test run`
 
 ---
 
@@ -1103,7 +1117,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   **Commit**: YES
   - Message: `fix(web): stale recommendation indicators + edge cases`
   - Files: `apps/web/src/hooks/**`, `apps/web/src/components/**` (updated)
-  - Pre-commit: `bun test`
+  - Pre-commit: `vp test run`
 
 ---
 
@@ -1116,7 +1130,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
 - [ ] F2. **Code Quality Review** — `unspecified-high`
-  Run `tsc --noEmit` + linter + `bun test`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
+  Run `tsc --noEmit` + linter + `vp test run`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
   Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
 - [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill)
@@ -1133,22 +1147,22 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 | Commit | Message | Files | Pre-commit |
 |--------|---------|-------|------------|
-| 1 | `feat(scaffold): initialize pnpm monorepo with apps/web and apps/api` | Root config, both app dirs | `pnpm install && pnpm build` |
-| 2 | `feat(api): add Hono skeleton with health endpoint` | `apps/api/src/**` | `cd apps/api && bun test` |
-| 3 | `feat(api): add Drizzle ORM + pipeline schema + migrations` | `apps/api/src/db/**` | `cd apps/api && bun test` |
-| 4 | `feat(web): add Zustand canvas store + shared types` | `apps/web/src/store/**`, `packages/shared/**` | `cd apps/web && bun test` |
-| 5 | `feat(shared): add shared types package for API contracts` | `packages/shared/**` | `pnpm install && pnpm build` |
-| 6 | `feat(web): add React Flow canvas with drag-and-drop sidebar` | `apps/web/src/components/**` | `cd apps/web && bun test` |
-| 7 | `feat(web): add IntentNode custom component with property editing` | `apps/web/src/components/nodes/**` | `cd apps/web && bun test` |
-| 8 | `feat(api): add pipeline CRUD endpoints` | `apps/api/src/routes/**` | `cd apps/api && bun test` |
-| 9 | `feat(api): add Gemini service + mock service` | `apps/api/src/services/**` | `cd apps/api && bun test` |
-| 10 | `feat(api): add /api/analyze-architecture endpoint` | `apps/api/src/routes/analyze.ts` | `cd apps/api && bun test` |
-| 11 | `feat(web): add edge protocol labels + analysis trigger UI` | `apps/web/src/components/canvas/**` | `cd apps/web && bun test` |
-| 12 | `feat(web): add save/load pipeline UX` | `apps/web/src/components/sidebar/**` | `cd apps/web && bun test` |
-| 13 | `feat(web): add frontend API client + integration` | `apps/web/src/api/**` | `cd apps/web && bun test` |
-| 14 | `feat(web): apply dark tech-industrial theme` | `apps/web/src/styles/**`, `tailwind.config.*` | `cd apps/web && bun test` |
-| 15 | `feat(e2e): end-to-end flow integration` | E2E test files | `bun test` |
-| 16 | `fix(web): stale recommendation indicators + edge cases` | `apps/web/src/**` | `bun test` |
+| 1 | `feat(scaffold): initialize Vite+ monorepo with vp test and vp dev` | Root config, both app dirs | `vp install && vp test run` |
+| 2 | `feat(api): add Hono skeleton with health endpoint` | `apps/api/src/**` | `cd apps/api && vp test run` |
+| 3 | `feat(api): add Drizzle ORM + pipeline schema + migrations` | `apps/api/src/db/**` | `cd apps/api && vp test run` |
+| 4 | `feat(web): add Zustand canvas store + shared types` | `apps/web/src/store/**`, `packages/shared/**` | `cd apps/web && vp test run` |
+| 5 | `feat(shared): add shared types package for API contracts` | `packages/shared/**` | `vp install && vp test run` |
+| 6 | `feat(web): add React Flow canvas with drag-and-drop sidebar` | `apps/web/src/components/**` | `cd apps/web && vp test run` |
+| 7 | `feat(web): add IntentNode custom component with property editing` | `apps/web/src/components/nodes/**` | `cd apps/web && vp test run` |
+| 8 | `feat(api): add pipeline CRUD endpoints` | `apps/api/src/routes/**` | `cd apps/api && vp test run` |
+| 9 | `feat(api): add Gemini service + mock service` | `apps/api/src/services/**` | `cd apps/api && vp test run` |
+| 10 | `feat(api): add /api/analyze-architecture endpoint` | `apps/api/src/routes/analyze.ts` | `cd apps/api && vp test run` |
+| 11 | `feat(web): add edge protocol labels + analysis trigger UI` | `apps/web/src/components/canvas/**` | `cd apps/web && vp test run` |
+| 12 | `feat(web): add save/load pipeline UX` | `apps/web/src/components/sidebar/**` | `cd apps/web && vp test run` |
+| 13 | `feat(web): add frontend API client + integration` | `apps/web/src/api/**` | `cd apps/web && vp test run` |
+| 14 | `feat(web): apply dark tech-industrial theme` | `apps/web/src/styles/**`, `tailwind.config.*` | `cd apps/web && vp test run` |
+| 15 | `feat(e2e): end-to-end flow integration` | E2E test files | `vp test run` |
+| 16 | `fix(web): stale recommendation indicators + edge cases` | `apps/web/src/**` | `vp test run` |
 
 ---
 
@@ -1156,10 +1170,11 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ### Verification Commands
 ```bash
-cd apps/web && bun test          # Expected: all frontend tests pass
-cd apps/api && bun test          # Expected: all backend tests pass
-cd apps/web && bun run build     # Expected: successful production build
-cd apps/api && bun run src/index.ts  # Expected: server starts on port 3000
+vp run -r test                   # Expected: all tests pass across both apps
+cd apps/web && vp test run       # Expected: all frontend tests pass
+cd apps/api && vp test run       # Expected: all backend tests pass
+cd apps/web && vp build          # Expected: successful production build
+cd apps/api && vp run dev        # Expected: server starts on port 3000
 ```
 
 ### Final Checklist
