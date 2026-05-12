@@ -72,6 +72,9 @@ const BRAND_LOGOS: Record<string, string> = {
   'ignition': 'inductiveautomation',
   'sap': 'sap',
   'lora': 'lorawan',
+  'power bi': 'powerbi',
+  'tableau': 'tableau',
+  'looker': 'looker',
 };
 
 const getBrandIcon = (label: string, size: number = 18) => {

@@ -215,6 +215,11 @@ export const NODE_SCHEMAS: Record<string, NodeSchema> = {
   'ERP Connector': APPLICATION_PROPERTIES,
   'LoRaWAN Gateway': EDGE_PROPERTIES,
 
+  'Power BI': ANALYTICS_PROPERTIES,
+  'Tableau': ANALYTICS_PROPERTIES,
+  'Looker': ANALYTICS_PROPERTIES,
+  'Custom Dashboard': CORE_PROPERTIES,
+
   // Sinks & Alerts
   'Grafana Dashboard': CORE_PROPERTIES,
   'Elasticsearch': STORAGE_PROPERTIES,
