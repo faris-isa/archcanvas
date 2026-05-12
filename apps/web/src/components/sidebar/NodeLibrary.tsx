@@ -6,7 +6,15 @@ import { getNodeIcon } from '../../utils/nodeIcons';
 const NODE_TYPES = [
   { 
     category: 'Edge & Sources', 
-    types: ['Factory Floor Sensor', 'Edge Gateway', 'PLC Controller', 'MQTT Client', 'OPC-UA Server', 'HTTP Webhook'] 
+    types: ['Factory Floor Sensor', 'Edge Gateway', 'PLC Controller', 'LoRaWAN Gateway', 'MQTT Client', 'OPC-UA Server', 'HTTP Webhook'] 
+  },
+  { 
+    category: 'Industrial Systems (SCADA/MES)', 
+    types: ['SCADA System', 'HMI Panel', 'Industrial Historian', 'MES Integration', 'ERP Connector'] 
+  },
+  { 
+    category: 'Connectivity & Security', 
+    types: ['Industrial Firewall', 'VPN Tunnel', 'Device Management', 'Digital Twin'] 
   },
   { 
     category: 'Applications & Clients', 

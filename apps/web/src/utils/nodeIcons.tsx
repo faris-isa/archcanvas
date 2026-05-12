@@ -28,7 +28,12 @@ import {
   MonitorSmartphone,
   Smartphone,
   Globe,
-  CloudCog
+  CloudCog,
+  Shield,
+  Lock,
+  History,
+  Copy,
+  Layout
 } from 'lucide-react';
 
 const BRAND_LOGOS: Record<string, string> = {
@@ -62,6 +67,10 @@ const BRAND_LOGOS: Record<string, string> = {
   'python': 'python',
   'nodejs': 'nodedotjs',
   'react': 'react',
+  'scada': 'inductiveautomation',
+  'ignition': 'inductiveautomation',
+  'sap': 'sap',
+  'lora': 'lorawan',
 };
 
 const getBrandIcon = (label: string, size: number = 18) => {
@@ -120,6 +129,19 @@ export const getNodeIcon = (label: string) => {
   // Storage
   if (l.includes('data lake')) return <Cloud size={18} />;
   if (l.includes('db')) return <Database size={18} />;
+
+  // Industrial Systems (SCADA/MES)
+  if (l.includes('scada')) return <Layout size={18} />;
+  if (l.includes('hmi')) return <Monitor size={18} />;
+  if (l.includes('historian')) return <History size={18} />;
+  if (l.includes('mes')) return <Workflow size={18} />;
+  if (l.includes('erp')) return <Share2 size={18} />;
+
+  // Connectivity & Security
+  if (l.includes('firewall')) return <Shield size={18} />;
+  if (l.includes('vpn')) return <Lock size={18} />;
+  if (l.includes('twin')) return <Copy size={18} />;
+  if (l.includes('management')) return <CloudCog size={18} />;
 
   // Sinks / Visuals
   if (l.includes('dashboard')) return <Monitor size={18} />;
