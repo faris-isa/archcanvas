@@ -15,19 +15,19 @@ export const NodeLibrary: React.FC = () => {
   };
 
   return (
-    <div className="w-64 bg-tech-gray border-r border-industrial-gray p-4 flex flex-col gap-6 overflow-y-auto">
+    <div className="w-64 bg-[var(--color-bg-secondary)] border-r border-[var(--color-border)] p-4 flex flex-col gap-6 overflow-y-auto transition-colors duration-300">
       <h2 className="text-xl font-bold text-industrial-gold mb-2">Node Library</h2>
       {NODE_TYPES.map((cat) => (
         <div key={cat.category} className="flex flex-col gap-2">
-          <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold">{cat.category}</h3>
+          <h3 className="text-xs uppercase tracking-wider text-[var(--color-text-secondary)] font-bold">{cat.category}</h3>
           {cat.types.map((type) => (
             <div
               key={type}
-              className="bg-gray-800 border border-gray-700 p-3 rounded cursor-grab hover:border-tech-accent transition-colors"
+              className="bg-[var(--color-bg-primary)] border border-[var(--color-border)] p-3 rounded cursor-grab hover:border-tech-accent transition-colors"
               onDragStart={(event) => onDragStart(event, type, cat.category)}
               draggable
             >
-              <span className="text-sm font-medium">{type}</span>
+              <span className="text-sm font-medium text-[var(--color-text-primary)]">{type}</span>
             </div>
           ))}
         </div>

@@ -4,7 +4,7 @@ import { useReactFlow } from '@xyflow/react';
 import { apiClient } from '../../api/client';
 
 export const SaveButton: React.FC = () => {
-  const { nodes, edges } = useCanvasStore();
+  const { } = useCanvasStore();
   const { toObject } = useReactFlow();
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +14,7 @@ export const SaveButton: React.FC = () => {
 
     setLoading(true);
     try {
-      const canvasState = JSON.stringify(toObject());
+      const canvasState = toObject();
       await apiClient.createPipeline(name, canvasState);
       alert('Pipeline saved successfully!');
     } catch (error: any) {
@@ -30,7 +30,7 @@ export const SaveButton: React.FC = () => {
     <button
       onClick={onSave}
       disabled={loading}
-      className="px-4 py-1.5 bg-tech-gray border border-industrial-gray hover:border-gray-400 rounded text-sm font-bold transition-colors disabled:opacity-50"
+      className="px-4 py-1.5 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-tech-accent rounded text-sm font-bold transition-colors duration-300 disabled:opacity-50"
     >
       {loading ? 'Saving...' : 'Save'}
     </button>

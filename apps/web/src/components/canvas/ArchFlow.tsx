@@ -8,9 +8,11 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useCanvasStore } from '../../store/useCanvasStore';
-import { IntentValues } from '@archcanvas/shared';
+import type { IntentValues } from '@archcanvas/shared';
 import IntentNode from '../nodes/IntentNode';
 import ProtocolEdge from './ProtocolEdge';
+
+import { useTheme } from '../../hooks/useTheme';
 
 const nodeTypes = {
   intentNode: IntentNode,
@@ -29,6 +31,7 @@ const DEFAULT_INTENT: IntentValues = {
 
 export const ArchFlow: React.FC = () => {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } = useCanvasStore();
+  const { theme } = useTheme();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition } = useReactFlow();
 
@@ -85,7 +88,7 @@ export const ArchFlow: React.FC = () => {
         fitView
       >
         <Controls />
-        <Background color="#333" gap={16} />
+        <Background color={theme === 'dark' ? '#555' : '#aaa'} gap={16} />
       </ReactFlow>
     </div>
   );
