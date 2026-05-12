@@ -74,3 +74,13 @@ body {
 .react-flow__edge-path {
   @apply !stroke-gray-500/30;
 }
+
+/* Brand Logo Dark Mode Support */
+.brand-logo {
+  filter: invert(1) brightness(1.2);
+  transition: filter 0.3s ease;
+}
+
+:root.light .brand-logo {
+  filter: none;
+}

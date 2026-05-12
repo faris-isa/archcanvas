@@ -88,9 +88,8 @@ const getBrandIcon = (label: string, size: number = 18) => {
         style={{ 
           width: size, 
           height: size, 
-          filter: 'brightness(0.8) grayscale(0.2)',
         }}
-        className="group-hover:filter-none transition-all duration-300"
+        className="brand-logo group-hover:scale-110 transition-transform duration-300"
       />
     );
   }
