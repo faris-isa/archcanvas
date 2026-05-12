@@ -113,6 +113,7 @@ const getBrandIcon = (label: string, size: number = 18) => {
           filter: 'brightness(0.8) grayscale(0.2)',
         }}
         className="brand-logo group-hover:scale-110 group-hover:filter-none transition-all duration-300"
+
       />
     );
   }
