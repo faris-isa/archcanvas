@@ -9,9 +9,9 @@ import {
   type NodeChange, 
   type EdgeChange,
   addEdge,
-  Connection
+  type Connection
 } from '@xyflow/react'
-import { ArchNodeData, IntentValues } from '@archcanvas/shared'
+import type { ArchNodeData } from '@archcanvas/shared'
 
 interface CanvasState {
   nodes: Node<ArchNodeData>[];

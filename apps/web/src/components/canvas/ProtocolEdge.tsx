@@ -1,4 +1,4 @@
-import React from 'react';
+
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -7,7 +7,6 @@ import {
 } from '@xyflow/react';
 
 export default function ProtocolEdge({
-  id,
   sourceX,
   sourceY,
   targetX,

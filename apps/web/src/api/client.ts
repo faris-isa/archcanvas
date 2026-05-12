@@ -1,4 +1,4 @@
-import { 
+import type { 
   AnalyzeRequest, 
   AnalyzeResponse, 
   PipelineSummary, 
@@ -36,7 +36,7 @@ export const apiClient = {
     return handleResponse<PipelineDetail>(res);
   },
 
-  async createPipeline(name: string, canvasState: string): Promise<PipelineDetail> {
+  async createPipeline(name: string, canvasState: any): Promise<PipelineDetail> {
     const res = await fetch('/api/pipelines', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -45,7 +45,7 @@ export const apiClient = {
     return handleResponse<PipelineDetail>(res);
   },
 
-  async updatePipeline(id: string, data: Partial<{ name: string; canvasState: string }>): Promise<PipelineDetail> {
+  async updatePipeline(id: string, data: Partial<{ name: string; canvasState: any }>): Promise<PipelineDetail> {
     const res = await fetch(`/api/pipelines/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

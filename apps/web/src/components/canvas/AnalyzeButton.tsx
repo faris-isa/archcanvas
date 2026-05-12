@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCanvasStore } from '../../store/useCanvasStore';
-import { AnalyzeRequest } from '@archcanvas/shared';
+import type { AnalyzeRequest } from '@archcanvas/shared';
 import { apiClient } from '../../api/client';
 
 export const AnalyzeButton: React.FC = () => {

@@ -42,7 +42,7 @@ export type PipelineSummary = {
 export type PipelineDetail = {
   id: string;
   name: string;
-  canvasState: string;
+  canvasState: any; // Native JSON object from Firestore
   createdAt: string;
   updatedAt: string;
 };

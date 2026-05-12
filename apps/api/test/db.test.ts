@@ -1,56 +1,43 @@
-import { expect, test, describe, beforeAll, afterAll } from "vitest";
-import { createPipeline, getPipelines, getPipelineById, updatePipeline, deletePipeline } from "../src/db/queries";
-import { db } from "../src/db/connection";
-import { pipelines } from "../src/db/schema";
+process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
+process.env.GCLOUD_PROJECT = "demo-archcanvas";
 
-describe("Pipeline DB Queries", () => {
-  const testId = "test-pipeline-1";
+import { expect, test, describe, beforeAll } from "vitest";
+import { pipelineService } from "../src/firebase/pipelineService";
 
-  beforeAll(async () => {
-    // Clean up or setup if needed
-    // Drizzle with better-sqlite3 uses a file, we might want to use memory for tests
-    // but for now let's just use the file and clean up
-    try {
-      await deletePipeline(testId);
-    } catch (e) {}
-  });
+describe("Pipeline Service (Firestore)", () => {
+  let testId: string;
 
   test("createPipeline should insert a new pipeline", async () => {
-    const newPipeline = {
-      id: testId,
-      name: "Test Pipeline",
-      canvasState: JSON.stringify({ nodes: [], edges: [] }),
-    };
-    const result = await createPipeline(newPipeline);
-    expect(result).toBeDefined();
-    expect(result.id).toBe(testId);
-    expect(result.name).toBe("Test Pipeline");
+    const name = "Test Pipeline";
+    const canvasState = { nodes: [], edges: [] };
+    testId = await pipelineService.createPipeline(name, canvasState);
+    expect(testId).toBeDefined();
+    expect(typeof testId).toBe("string");
   });
 
-  test("getPipelines should return all pipelines", async () => {
-    const list = await getPipelines();
+  test("listPipelines should return all pipelines", async () => {
+    const list = await pipelineService.listPipelines();
     expect(list.length).toBeGreaterThan(0);
     expect(list.some(p => p.id === testId)).toBe(true);
   });
 
-  test("getPipelineById should return the correct pipeline", async () => {
-    const pipeline = await getPipelineById(testId);
+  test("getPipeline should return the correct pipeline", async () => {
+    const pipeline = await pipelineService.getPipeline(testId);
     expect(pipeline).toBeDefined();
     expect(pipeline?.id).toBe(testId);
+    expect(pipeline?.name).toBe("Test Pipeline");
   });
 
   test("updatePipeline should update pipeline data", async () => {
-    const updated = await updatePipeline(testId, { name: "Updated Name" });
+    await pipelineService.updatePipeline(testId, "Updated Name");
+    const updated = await pipelineService.getPipeline(testId);
     expect(updated).toBeDefined();
-    expect(updated.name).toBe("Updated Name");
+    expect(updated?.name).toBe("Updated Name");
   });
 
   test("deletePipeline should remove the pipeline", async () => {
-    const deleted = await deletePipeline(testId);
-    expect(deleted).toBeDefined();
-    expect(deleted.id).toBe(testId);
-    
-    const pipeline = await getPipelineById(testId);
-    expect(pipeline).toBeUndefined();
+    await pipelineService.deletePipeline(testId);
+    const pipeline = await pipelineService.getPipeline(testId);
+    expect(pipeline).toBeNull();
   });
 });

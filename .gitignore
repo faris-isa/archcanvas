@@ -39,4 +39,4 @@ test-results/
 
 # Sisyphus
 .sisyphus/evidence/
-.sisyphus/logs/
+.sisyphus/logs/sdk/
