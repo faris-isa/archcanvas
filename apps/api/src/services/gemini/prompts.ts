@@ -4,17 +4,16 @@ Analyze the following data pipeline connections and recommend the optimal transp
 
 Each node has "intentProperties" representing technical constraints.
 
-Use these properties to make decisions based on the **Connection Archetype**:
-- **Field-to-Edge (Sensor/PLC -> Gateway)**: Use MQTT, OPC UA, or Modbus TCP. Focus on low overhead and industrial reliability.
-- **Edge-to-Cloud (Gateway -> Broker/Cloud DB)**: Use MQTT (with TLS), HTTPS, or AMQP. Focus on security and WAN traversal.
-- **Agent-to-Pipeline (Telegraf/Fluentd -> Kafka/InfluxDB)**: Use native optimized protocols (e.g., Influx Line Protocol, Kafka Wire Protocol).
-- **Service-to-Service (Backend -> Backend)**: Use gRPC, NATS, or Kafka for high-performance internal communication.
-- **Client-to-App (Web/Mobile -> API)**: Use REST (HTTP/2), GraphQL, or WebSockets.
+**MANDATORY ARCHITECTURAL RULES**:
+1. **STRICTLY FORBIDDEN**: Never recommend gRPC for anything in the "Edge & Sources" or "Industrial Systems" categories. gRPC is only for Layer 4 (Application) and above.
+2. **Field-to-Control (Sensor -> PLC)**: Use Modbus TCP, IO-Link, or simple Analog/Digital signals.
+3. **Control-to-Control (PLC -> PLC)**: Use OPC UA or Modbus TCP.
+4. **Field-to-Edge (Sensor/PLC -> Gateway)**: Use MQTT or OPC UA.
+5. **Security**: Always prefer MQTT with TLS or HTTPS for WAN traversal (Edge-to-Cloud).
 
-**Protocol Constraints**:
-- Never recommend gRPC for field-level sensors or PLCs.
-- Use CoAP for extremely battery-constrained devices.
-- Use DNP3 for Utilities/SCADA contexts.
+**Categorization Context (ISA-95)**:
+- **Level 0-2 (Physical/Control)**: Modbus, OPC UA, MQTT, CoAP.
+- **Level 3-4 (Operation/Enterprise)**: Kafka, gRPC, REST, GraphQL.
 `;
 
 export const STRUCTURAL_ANALYSIS_PROMPT = `
