@@ -52,7 +52,8 @@ const BRAND_LOGOS: Record<string, string> = {
   'elasticsearch': 'elasticsearch',
   'slack': 'slack',
   'grafana': 'grafana',
-  'telegraf': 'telegraf',
+  'telegraf': 'influxdb',
+  'influx': 'influxdb',
   'fluentd': 'fluentd',
   'vector': 'vector',
   'rabbitmq': 'rabbitmq',
@@ -82,22 +83,40 @@ const BRAND_LOGOS: Record<string, string> = {
   'vector': 'vector',
 };
 
+const SPECIAL_LOGOS: Record<string, string> = {
+  'tableau': 'https://www.svgrepo.com/show/342280/tableau.svg',
+  'power bi': 'https://www.svgrepo.com/show/473761/powerbi.svg',
+  'slack': 'https://www.svgrepo.com/show/521850/slack.svg',
+  'vector': 'https://www.svgrepo.com/show/354510/vector-timber.svg',
+  'questdb': 'https://questdb.com/img/questdb-logo-themed.svg',
+};
+
 const getBrandIcon = (label: string, size: number = 18) => {
   const l = label.toLowerCase();
-  const brandKey = Object.keys(BRAND_LOGOS).find(key => l.includes(key));
   
-  if (brandKey) {
-    const slug = BRAND_LOGOS[brandKey];
-    // We use a CSS filter to make the icons match our industrial theme (slightly dimmed/grayish until hover)
+  // 1. Try Special Mappings (Direct URLs)
+  const specialKey = Object.keys(SPECIAL_LOGOS).find(key => l.includes(key));
+  if (specialKey) {
     return (
       <img 
-        src={`https://cdn.simpleicons.org/${slug}/ffffff`} 
+        src={SPECIAL_LOGOS[specialKey]} 
         alt={label}
-        style={{ 
-          width: size, 
-          height: size, 
-        }}
-        className="group-hover:scale-110 transition-transform duration-300"
+        style={{ width: size, height: size }}
+        className="brand-logo group-hover:scale-110 transition-transform duration-300"
+      />
+    );
+  }
+
+  // 2. Try SimpleIcons (Slugs)
+  const brandKey = Object.keys(BRAND_LOGOS).find(key => l.includes(key));
+  if (brandKey) {
+    const slug = BRAND_LOGOS[brandKey];
+    return (
+      <img 
+        src={`https://unpkg.com/simple-icons@latest/icons/${slug}.svg`} 
+        alt={label}
+        style={{ width: size, height: size }}
+        className="brand-logo group-hover:scale-110 transition-transform duration-300"
       />
     );
   }
