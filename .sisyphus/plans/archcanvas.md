@@ -66,14 +66,14 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 - Working end-to-end flow: drag → connect → set properties → analyze → see recommendations → save
 
 ### Definition of Done
-- [ ] User can drag nodes from sidebar onto canvas
-- [ ] User can set 4 intent properties per node
-- [ ] User can connect nodes with edges
-- [ ] User can click "Analyze" and see AI-recommended protocols per edge
-- [ ] Mock mode works without Gemini API key
-- [ ] User can save/load pipeline designs via sidebar
+- [x] User can drag nodes from sidebar onto canvas
+- [x] User can set 4 intent properties per node
+- [x] User can connect nodes with edges
+- [x] User can click "Analyze" and see AI-recommended protocols per edge
+- [x] Mock mode works without Gemini API key
+- [x] User can save/load pipeline designs via sidebar
 - [ ] All tests pass (`vp test` in both apps)
-- [ ] Dark tech-industrial UI theme applied throughout
+- [x] Dark tech-industrial UI theme applied throughout
 
 ### Must Have
 - React Flow drag-and-drop from sidebar to canvas
@@ -196,7 +196,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ## TODOs
 
-- [ ] 1. Monorepo scaffold + dev tooling
+- [x] 1. Monorepo scaffold + dev tooling
 
   **What to do**:
   - Initialize Vite+ monorepo structure with workspace config for `apps/*`
@@ -283,7 +283,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 2. Hono API skeleton + health endpoint
+- [x] 2. Hono API skeleton + health endpoint
 
   **What to do**:
   - TDD: Write test for `GET /api/health` returning `{ status: "ok", timestamp: "..." }`
@@ -344,7 +344,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 3. Drizzle ORM setup + migrations + pipeline schema
+- [x] 3. Drizzle ORM setup + migrations + pipeline schema
 
   **What to do**:
   - TDD: Write tests for pipeline CRUD operations (create, read, list, delete)
@@ -397,7 +397,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 4. Zustand canvas store + types
+- [x] 4. Zustand canvas store + types
 
   **What to do**:
   - TDD: Write tests for store actions — addNode, removeNode, updateNodeData, addEdge, removeEdge, onNodesChange, onEdgesChange, setAnalysisResults
@@ -454,7 +454,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 5. Shared types package for API contracts
+- [x] 5. Shared types package for API contracts
 
   **What to do**:
   - Create `packages/shared/` with `package.json`, `tsconfig.json`
@@ -505,7 +505,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 6. React Flow canvas + drag-and-drop from sidebar
+- [x] 6. React Flow canvas + drag-and-drop from sidebar
 
   **What to do**:
   - TDD: Write tests for drag-and-drop behavior
@@ -562,7 +562,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 7. IntentNode custom component + property editing
+- [x] 7. IntentNode custom component + property editing
 
   **What to do**:
   - TDD: Write tests for IntentNode rendering and property editing
@@ -617,7 +617,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 8. Hono pipeline CRUD endpoints
+- [x] 8. Hono pipeline CRUD endpoints
 
   **What to do**:
   - TDD: Write tests for all pipeline endpoints
@@ -675,7 +675,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 9. Gemini service + mock service
+- [x] 9. Gemini service + mock service
 
   **What to do**:
   - TDD: Write tests for both GeminiService and MockAnalysisService
@@ -733,7 +733,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 10. /api/analyze-architecture endpoint
+- [x] 10. /api/analyze-architecture endpoint
 
   **What to do**:
   - TDD: Write tests for analyze endpoint
@@ -785,7 +785,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 11. Edge protocol labels + analysis trigger UI
+- [x] 11. Edge protocol labels + analysis trigger UI
 
   **What to do**:
   - TDD: Write tests for edge label rendering and analysis trigger
@@ -839,7 +839,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 12. Save/Load pipeline UX (sidebar list + save button)
+- [x] 12. Save/Load pipeline UX (sidebar list + save button)
 
   **What to do**:
   - TDD: Write tests for save/load functionality
@@ -893,7 +893,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 13. Frontend API client + integration
+- [x] 13. Frontend API client + integration
 
   **What to do**:
   - TDD: Write tests for API client functions
@@ -943,7 +943,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 14. Dark tech-industrial theme
+- [x] 14. Dark tech-industrial theme
 
   **What to do**:
   - Create `apps/web/src/styles/theme.css` with dark theme variables:
@@ -999,7 +999,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 15. End-to-end flow: drag → connect → analyze → save
+- [x] 15. End-to-end flow: drag → connect → analyze → save
 
   **What to do**:
   - Integration test for full user flow
@@ -1053,7 +1053,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [ ] 16. Stale recommendation indicators + edge cases
+- [x] 16. Stale recommendation indicators + edge cases
 
   **What to do**:
   - TDD: Write tests for stale detection and edge cases
@@ -1178,8 +1178,8 @@ cd apps/api && vp run dev        # Expected: server starts on port 3000
 ```
 
 ### Final Checklist
-- [ ] All "Must Have" present
-- [ ] All "Must NOT Have" absent
+- [x] All "Must Have" present
+- [x] All "Must NOT Have" absent
 - [ ] All tests pass
 - [ ] Dark theme applied throughout
 - [ ] Drag-and-drop works: sidebar → canvas

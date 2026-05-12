@@ -1,0 +1,25 @@
+{
+  "name": "@archcanvas/api",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@google/genai": "^2.0.1",
+    "@hono/node-server": "^1.11.1",
+    "better-sqlite3": "^12.9.0",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.3.7",
+    "@archcanvas/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20.12.12",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.10.5",
+    "typescript": "^5.4.5"
+  }
+}

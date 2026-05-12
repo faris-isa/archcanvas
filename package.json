@@ -1,0 +1,27 @@
+{
+  "name": "juara-vibe-coding",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vp run -r dev",
+    "test": "vp run -r test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.5",
+    "vite-plus": "^0.1.20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/faris-isa/archcanvas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/faris-isa/archcanvas/issues"
+  },
+  "homepage": "https://github.com/faris-isa/archcanvas#readme",
+  "packageManager": "pnpm@11.1.0"
+}
