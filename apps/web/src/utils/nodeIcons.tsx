@@ -68,17 +68,15 @@ const BRAND_LOGOS: Record<string, string> = {
   'python': 'python',
   'nodejs': 'nodedotjs',
   'react': 'react',
-  'scada': 'inductiveautomation',
-  'ignition': 'inductiveautomation',
   'sap': 'sap',
-  'lora': 'lorawan',
   'power bi': 'powerbi',
   'tableau': 'tableau',
   'looker': 'looker',
-  'timescale': 'timescaledb',
+  'timescale': 'timescale',
   'questdb': 'questdb',
   'victoria': 'victoriametrics',
   'druid': 'apachedruid',
+  'vector': 'vector',
 };
 
 const getBrandIcon = (label: string, size: number = 18) => {
@@ -114,6 +112,7 @@ export const getNodeIcon = (label: string) => {
   if (l.includes('sensor')) return <Activity size={18} />;
   if (l.includes('plc')) return <Cpu size={18} />;
   if (l.includes('gateway')) return <Zap size={18} />;
+  if (l.includes('lora')) return <Waves size={18} />;
   if (l.includes('mqtt')) return <MessageSquare size={18} />;
   if (l.includes('opc')) return <Server size={18} />;
   if (l.includes('webhook')) return <Webhook size={18} />;
@@ -143,7 +142,7 @@ export const getNodeIcon = (label: string) => {
   if (l.includes('hmi')) return <Monitor size={18} />;
   if (l.includes('historian')) return <History size={18} />;
   if (l.includes('mes')) return <Workflow size={18} />;
-  if (l.includes('erp')) return <Share2 size={18} />;
+  if (l.includes('erp')) return <Box size={18} />;
 
   // Connectivity & Security
   if (l.includes('firewall')) return <Shield size={18} />;
