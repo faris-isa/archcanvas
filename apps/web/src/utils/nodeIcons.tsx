@@ -30,6 +30,7 @@ import {
 
 const BRAND_LOGOS: Record<string, string> = {
   'kafka': 'apachekafka',
+  'influx': 'influxdb',
   'prometheus': 'prometheus',
   'postgres': 'postgresql',
   'mysql': 'mysql',
@@ -45,6 +46,7 @@ const BRAND_LOGOS: Record<string, string> = {
   'telegraf': 'influxdb',
   'influx': 'influxdb',
   'fluentd': 'fluentd',
+  'vector': 'vector',
   'rabbitmq': 'rabbitmq',
   'nats': 'natsdotio',
   'pulsar': 'apachepulsar',
@@ -103,8 +105,12 @@ const getBrandIcon = (label: string, size: number = 18) => {
       <img
         src={`https://unpkg.com/simple-icons@latest/icons/${slug}.svg`}
         alt={label}
-        style={{ width: size, height: size }}
-        className="brand-logo group-hover:scale-110 transition-transform duration-300"
+        style={{ 
+          width: size, 
+          height: size,
+          filter: 'brightness(0.8) grayscale(0.2)',
+        }}
+        className="brand-logo group-hover:scale-110 group-hover:filter-none transition-all duration-300"
       />
     );
   }
@@ -113,7 +119,6 @@ const getBrandIcon = (label: string, size: number = 18) => {
 
 export const getNodeIcon = (label: string) => {
   const l = label.toLowerCase();
-
   // Try to get a brand logo first
   const brandIcon = getBrandIcon(label);
   if (brandIcon) return brandIcon;
