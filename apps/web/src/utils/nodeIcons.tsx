@@ -67,7 +67,7 @@ const BRAND_LOGOS: Record<string, string> = {
   'power bi': 'powerbi',
   'tableau': 'tableau',
   'looker': 'looker',
-  'timescale': 'timescale',
+  'timescale': 'timescaledb',
   'questdb': 'questdb',
   'victoria': 'victoriametrics',
   'druid': 'apachedruid',
