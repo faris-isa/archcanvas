@@ -26,6 +26,14 @@ Each node has "intentProperties" representing technical constraints.
 **ISA-95 CONTEXT**:
 - **Levels 0-2 (The Floor)**: Modbus, OPC UA, MQTT, CoAP. (NO gRPC)
 - **Levels 3-4 (The Office)**: Kafka, gRPC, REST, GraphQL.
+
+**EXAMPLES (WRONG VS RIGHT)**:
+- **WRONG**: [Edge & Sources] Sensor -> [Edge & Sources] PLC (Protocol: gRPC)
+- **RIGHT**: [Edge & Sources] Sensor -> [Edge & Sources] PLC (Protocol: Modbus TCP)
+- **WRONG**: [Industrial Systems] SCADA -> [Edge & Sources] PLC (Protocol: REST)
+- **RIGHT**: [Industrial Systems] SCADA -> [Edge & Sources] PLC (Protocol: OPC UA)
+
+*Note: Category-based rules ALWAYS override individual node properties like "Environment". Even if a Sensor is in the "Cloud", it still uses industrial protocols.*
 `;
 
 export const STRUCTURAL_ANALYSIS_PROMPT = `

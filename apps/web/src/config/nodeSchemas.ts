@@ -61,6 +61,11 @@ const STORAGE_PROPERTIES: NodeSchema = {
 
 const EDGE_PROPERTIES: NodeSchema = {
   ...CORE_PROPERTIES,
+  'environment': {
+    label: 'Environment',
+    options: ['edge', 'cloud', 'on-premise'],
+    default: 'edge'
+  },
   'power-source': {
     label: 'Power Source',
     options: ['battery', 'mains', 'poe'],
