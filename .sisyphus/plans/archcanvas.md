@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-> **Quick Summary**: Build ArchCanvas — a React Flow canvas tool where users drag agnostic pipeline nodes, set intent properties, and get AI-recommended transport protocols via Gemini. Vite+ monorepo (apps/web uses `vp` toolchain + Vitest, apps/api uses Bun + `vp test run`), SQLite persistence, TDD throughout.
+> **Quick Summary**: Build ArchCanvas — a React Flow canvas tool where users drag agnostic pipeline nodes, set intent properties, and get AI-recommended transport protocols via Gemini. Vite+ monorepo (apps/web uses `vp` toolchain, apps/api uses `vp` toolchain), Firestore persistence, TDD throughout.
 >
 > **Deliverables**:
 > - Monorepo scaffold (Vite+ workspace with apps/web and apps/api)
@@ -10,7 +10,7 @@
 > - Intent property editing per node (4 properties: throughput-rate, environment, latency-tolerance, network-reliability)
 > - Hono API backend with Gemini integration + mock mode
 > - AI protocol recommendation: batch-analyze all edges, return protocol + explanation per connection
-> - SQLite persistence via Drizzle ORM — save/load pipeline designs (Excalidraw-like UX)
+> - Firestore persistence via Firebase Admin — save/load pipeline designs (Excalidraw-like UX)
 > - Dark tech-industrial UI theme
 >
 > **Estimated Effort**: Large
@@ -27,7 +27,7 @@ Build ArchCanvas — an intent-driven data pipeline architecting tool. Users dra
 ### Interview Summary
 **Key Discussions**:
 - **MVP Scope**: Core pipeline first — canvas + AI recommendation on all connections. Not full production.
-- **Persistence**: SQLite via Drizzle ORM — Excalidraw-like save/load. Sidebar list + save button UX.
+- **Persistence**: Firestore via Firebase Admin — Excalidraw-like save/load. Sidebar list + save button UX.
 - **AI Output**: Protocol name + engineering explanation per edge. Batch analysis (all edges at once).
 - **Mock Mode**: Fallback Gemini service for dev without API key.
 - **Testing**: TDD (red-green-refactor) for every feature.
@@ -37,7 +37,7 @@ Build ArchCanvas — an intent-driven data pipeline architecting tool. Users dra
 - **React Flow v12**: Use `@xyflow/react`. Key patterns: Zustand store with `applyNodeChanges`/`applyEdgeChanges`. Drag-and-drop uses `onDragStart` + `onDrop` + `screenToFlowPosition`. Edge data mutation does NOT trigger re-render — must create new objects.
 - **Hono**: Node.js server via `@hono/node-server`. Middleware stack (cors, logger, bodyLimit). Error handling via `HTTPException`.
 - **Gemini**: `@google/genai` SDK with API key auth. Structured output via `responseMimeType: 'application/json'` + `responseSchema`. Only certain models support structured output — use `gemini-2.0-flash` or `gemini-1.5-pro`.
-- **SQLite + Drizzle**: No native JSON column type — use TEXT columns with manual JSON serialization for canvas state.
+- **Firestore (Firebase)**: Stores JSON natively (no serialization needed). Cloud Run deployment uses Firebase service account credentials.
 - **VitePlus**: React TypeScript scaffolding with Vite proxy support.
 
 ### Metis Review
@@ -56,13 +56,13 @@ Build ArchCanvas — an intent-driven data pipeline architecting tool. Users dra
 ## Work Objectives
 
 ### Core Objective
-Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag generic pipeline nodes, configure intent properties, connect them, and get AI-recommended transport protocols — all persisted to SQLite.
+Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag generic pipeline nodes, configure intent properties, connect them, and get AI-recommended transport protocols — all persisted to Firestore.
 
 ### Concrete Deliverables
 - `apps/web/` — Vite+ React frontend with React Flow canvas, sidebar, node library, property panel
-- `apps/api/` — Hono backend with Gemini integration, mock service, and Drizzle ORM persistence
+- `apps/api/` — Hono backend with Gemini integration, mock service, and Firestore persistence
 - `packages/shared/` — Shared types between frontend and backend
-- SQLite database with `pipelines` table storing canvas state as JSON text
+- Firestore database with `pipelines` collection storing canvas state as native JSON objects
 - Working end-to-end flow: drag → connect → set properties → analyze → see recommendations → save
 
 ### Definition of Done
@@ -81,7 +81,7 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 - Edge labels showing recommended protocol after analysis
 - Batch analysis (all edges at once) via Hono → Gemini
 - Mock service fallback when no API key provided
-- SQLite save/load via Drizzle ORM
+- Firestore save/load via Firebase Admin SDK
 - Vite proxy to Hono (no CORS)
 - Dark theme throughout
 - TDD — every feature has tests
@@ -129,7 +129,7 @@ Evidence saved to `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.
 Wave 1a (Start Immediately — foundation):
 ├── Task 1: Monorepo scaffold + dev tooling [quick]
 ├── Task 2: Hono API skeleton + health endpoint [quick]  (after Task 1)
-├── Task 3: Drizzle ORM setup + migrations + pipeline schema [quick]  (after Task 1)
+├── Task 3: Firebase Admin SDK setup + Firestore pipeline service [quick]  (after Task 1)
 └── Task 5: Shared types package for API contracts [quick]  (after Task 1)
 
 Wave 1b (After Wave 1a — types available):
@@ -204,7 +204,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Scaffold `apps/api` with Hono Node.js template
   - Install root dev dependencies: `typescript`
   - Install web dependencies: `@xyflow/react`, `zustand`, `lucide-react`, `tailwindcss`, `postcss`, `autoprefixer`
-  - Install api dependencies: `@hono/node-server`, `@google/genai`, `drizzle-orm`, `better-sqlite3`, `drizzle-kit`
+  - Install api dependencies: `@hono/node-server`, `@google/genai`, `firebase-admin`
   - Configure `tailwind.config.ts` with dark theme base colors
   - Configure Vite proxy: `/api` → `http://localhost:3000`
   - Add root `package.json` scripts: `"dev": "vp run -r dev"`, `"test": "vp run -r test"`
@@ -344,22 +344,23 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ---
 
-- [x] 3. Drizzle ORM setup + migrations + pipeline schema
+- [x] 3. Firebase Admin SDK setup + Firestore pipeline service
 
   **What to do**:
   - TDD: Write tests for pipeline CRUD operations (create, read, list, delete)
-  - Create `apps/api/src/db/schema.ts` with `pipelines` table: `id` (text, pk), `name` (text, not null), `canvas_state` (text, JSON-serialized), `created_at` (integer), `updated_at` (integer)
-  - Create `apps/api/src/db/connection.ts` for SQLite via `better-sqlite3`
-  - Create `apps/api/src/db/queries.ts` with typed CRUD functions
-  - Configure `drizzle-kit` in `apps/api/drizzle.config.ts`
-  - Use TEXT column for canvas_state with manual JSON.stringify/parse (no native SQLite JSON type)
+  - Install `firebase-admin` npm package
+  - Create `apps/api/src/firebase/init.ts` — Firebase Admin initialization with service account from env vars
+  - Create `apps/api/src/firebase/pipelineService.ts` with typed CRUD functions
+  - Firestore `pipelines` collection with fields: `name` (string), `canvas_state` (map — native JSON), `created_at` (timestamp), `updated_at` (timestamp)
+  - Configure Firebase emulator for local dev: `apps/api/firebase.json`
+  - canvas_state stored as native Firestore map — no JSON serialization needed
 
   **Must NOT do**:
   - NO Hono routes for pipelines (Task 8), NO Gemini logic, NO shared types (Task 5)
 
   **Recommended Agent Profile**:
   - **Category**: `quick`
-  - **Skills**: [`drizzle-orm`]
+  - **Skills**: []
 
   **Parallelization**:
   - **Can Run In Parallel**: YES (with Tasks 2, 4, 5)
@@ -368,15 +369,15 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - **Blocked By**: 1
 
   **References**:
-  - Drizzle ORM SQLite: `https://orm.drizzle.team/docs/get-started-sqlite`
-  - Drizzle Kit: `https://orm.drizzle.team/docs/migrations`
+  - Firebase Admin SDK: `https://firebase.google.com/docs/admin/setup`
+  - Firestore Node.js: `https://firebase.google.com/docs/firestore/quickstart`
 
   **Acceptance Criteria**:
   - [ ] `pipelines` table schema defined with all columns
-  - [ ] `canvas_state` is TEXT column storing serialized JSON
+  - [ ] `canvas_state` stored as native Firestore map (no serialization needed)
   - [ ] `vp test run` (from apps/api) passes with CRUD tests
-  - [ ] `vp drizzle-kit generate` creates migration files
-  - [ ] `vp drizzle-kit push` applies schema to SQLite
+  - [ ] Firebase emulator configured for local dev testing
+  - [ ] Firestore collections auto-created on first write
 
   **QA Scenarios**:
   ```
@@ -387,12 +388,12 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
       2. Assert create/read/delete all pass
       3. Verify canvas_state round-trips with JSON parse/stringify
     Expected Result: All CRUD operations pass their tests
-    Evidence: .sisyphus/evidence/task-3-drizzle-crud.txt
+    Evidence: .sisyphus/evidence/task-3-firestore-crud.txt
   ```
 
   **Commit**: YES
-  - Message: `feat(api): add Drizzle ORM + pipeline schema + migrations`
-  - Files: `apps/api/src/db/**`, `apps/api/drizzle.config.ts`
+  - Message: `feat(api): add Firebase Admin SDK + Firestore pipeline service`
+  - Files: `apps/api/src/firebase/**`, `apps/api/firebase.json`
   - Pre-commit: `cd apps/api && vp test run`
 
 ---
@@ -627,7 +628,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
     - `POST /api/pipelines` — create (body: `{ name, canvasState }`)
     - `PUT /api/pipelines/:id` — update
     - `DELETE /api/pipelines/:id` — delete
-  - Use `@archcanvas/shared` types and `apps/api/src/db/queries.ts`
+  - Use `@archcanvas/shared` types and `apps/api/src/firebase/pipelineService.ts`
   - Auto-update `updated_at` on PUT
 
   **Must NOT do**:
@@ -1149,7 +1150,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 |--------|---------|-------|------------|
 | 1 | `feat(scaffold): initialize Vite+ monorepo with vp test and vp dev` | Root config, both app dirs | `vp install && vp test run` |
 | 2 | `feat(api): add Hono skeleton with health endpoint` | `apps/api/src/**` | `cd apps/api && vp test run` |
-| 3 | `feat(api): add Drizzle ORM + pipeline schema + migrations` | `apps/api/src/db/**` | `cd apps/api && vp test run` |
+| 3 | `feat(api): add Firebase Admin SDK + Firestore pipeline service` | `apps/api/src/firebase/**`, `apps/api/firebase.json` | `cd apps/api && vp test run` |
 | 4 | `feat(web): add Zustand canvas store + shared types` | `apps/web/src/store/**`, `packages/shared/**` | `cd apps/web && vp test run` |
 | 5 | `feat(shared): add shared types package for API contracts` | `packages/shared/**` | `vp install && vp test run` |
 | 6 | `feat(web): add React Flow canvas with drag-and-drop sidebar` | `apps/web/src/components/**` | `cd apps/web && vp test run` |
@@ -1180,11 +1181,11 @@ cd apps/api && vp run dev        # Expected: server starts on port 3000
 ### Final Checklist
 - [x] All "Must Have" present
 - [x] All "Must NOT Have" absent
-- [ ] All tests pass
-- [ ] Dark theme applied throughout
-- [ ] Drag-and-drop works: sidebar → canvas
-- [ ] Intent properties editable per node
-- [ ] AI analysis returns protocol + explanation per edge
+- [x] All tests pass
+- [x] Dark theme applied throughout
+- [x] Drag-and-drop works: sidebar → canvas
+- [x] Intent properties editable per node
+- [x] AI analysis returns protocol + explanation per edge
 - [ ] Mock mode works without API key
-- [ ] Save/load works: create, list, load, delete pipelines
+- [x] Save/load works: create, list, load, delete pipelines
 - [ ] Vite proxy to Hono works (no CORS errors)
