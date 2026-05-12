@@ -102,33 +102,34 @@ export const NodeLibrary: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-8 scrollbar-thin scrollbar-thumb-[var(--color-border)]">
         {filteredNodeTypes.length > 0 ? (
           filteredNodeTypes.map((cat) => (
-          <div key={cat.category} className="space-y-3">
-            <h3 className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-text-secondary)] font-black flex items-center gap-2">
-              <span className="w-1 h-1 bg-tech-accent rounded-full"></span>
-              {cat.category}
-            </h3>
-            <div className="grid grid-cols-1 gap-2">
-              {cat.types.map((type) => (
-                <div
-                  key={type}
-                  className="group relative bg-[var(--color-bg-primary)]/40 border border-[var(--color-border)] p-3 rounded-lg cursor-grab hover:border-tech-accent/50 hover:bg-[var(--color-bg-primary)] transition-all duration-200 flex items-center gap-3 overflow-hidden"
-                  onDragStart={(event) => onDragStart(event, type, cat.category)}
-                  draggable
-                >
-                  <div className="text-[var(--color-text-secondary)] group-hover:text-tech-accent transition-colors">
-                    {getNodeIcon(type)}
+            <div key={cat.category} className="space-y-3">
+              <h3 className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-text-secondary)] font-black flex items-center gap-2">
+                <span className="w-1 h-1 bg-tech-accent rounded-full"></span>
+                {cat.category}
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                {cat.types.map((type) => (
+                  <div
+                    key={type}
+                    className="group relative bg-[var(--color-bg-primary)]/40 border border-[var(--color-border)] p-3 rounded-lg cursor-grab hover:border-tech-accent/50 hover:bg-[var(--color-bg-primary)] transition-all duration-200 flex items-center gap-3 overflow-hidden"
+                    onDragStart={(event) => onDragStart(event, type, cat.category)}
+                    draggable
+                  >
+                    <div className="text-[var(--color-text-secondary)] group-hover:text-tech-accent transition-colors">
+                      {getNodeIcon(type)}
+                    </div>
+                    <span className="text-[13px] font-medium text-[var(--color-text-primary)] group-hover:translate-x-0.5 transition-transform">
+                      {type}
+                    </span>
+                    
+                    {/* Subtle accent line on hover */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-tech-accent scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
                   </div>
-                  <span className="text-[13px] font-medium text-[var(--color-text-primary)] group-hover:translate-x-0.5 transition-transform">
-                    {type}
-                  </span>
-                  
-                  {/* Subtle accent line on hover */}
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-tech-accent scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )) : (
+          ))
+        ) : (
           <div className="flex flex-col items-center justify-center py-10 text-center opacity-50">
             <Search size={32} className="text-industrial-gray mb-2" />
             <p className="text-xs text-industrial-gray">No nodes found matching "{searchQuery}"</p>
