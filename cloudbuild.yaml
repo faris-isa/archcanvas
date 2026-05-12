@@ -37,3 +37,6 @@ steps:
 images:
   - 'gcr.io/$PROJECT_ID/arch-api'
   - 'gcr.io/$PROJECT_ID/arch-web'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
