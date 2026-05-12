@@ -4,16 +4,28 @@ Analyze the following data pipeline connections and recommend the optimal transp
 
 Each node has "intentProperties" representing technical constraints.
 
-**MANDATORY ARCHITECTURAL RULES**:
-1. **STRICTLY FORBIDDEN**: Never recommend gRPC for anything in the "Edge & Sources" or "Industrial Systems" categories. gRPC is only for Layer 4 (Application) and above.
-2. **Field-to-Control (Sensor -> PLC)**: Use Modbus TCP, IO-Link, or simple Analog/Digital signals.
-3. **Control-to-Control (PLC -> PLC)**: Use OPC UA or Modbus TCP.
-4. **Field-to-Edge (Sensor/PLC -> Gateway)**: Use MQTT or OPC UA.
-5. **Security**: Always prefer MQTT with TLS or HTTPS for WAN traversal (Edge-to-Cloud).
+**STRICT PROTOCOL SELECTION MATRIX (MANDATORY)**:
 
-**Categorization Context (ISA-95)**:
-- **Level 0-2 (Physical/Control)**: Modbus, OPC UA, MQTT, CoAP.
-- **Level 3-4 (Operation/Enterprise)**: Kafka, gRPC, REST, GraphQL.
+| Source Category | Target Category | Allowed Protocols (PICK ONE) |
+| :--- | :--- | :--- |
+| Edge & Sources | Edge & Sources | Modbus TCP, IO-Link, OPC UA |
+| Edge & Sources | Industrial Systems | OPC UA, Modbus TCP, MQTT |
+| Edge & Sources | Connectivity & Security | MQTT, OPC UA |
+| Industrial Systems | Industrial Systems | OPC UA, Modbus TCP, MQTT |
+| Connectivity & Security | Transport & Stream | MQTT, AMQP, Kafka Wire Protocol |
+| Transport & Stream | Storage & DB | Kafka Wire Protocol, Influx Line Protocol |
+| Applications & Clients | Applications & Clients | gRPC, REST, WebSockets, NATS |
+| Processing | Transport & Stream | Kafka Wire Protocol, NATS |
+
+**HARD CONSTRAINTS**:
+- **STRICTLY FORBIDDEN**: Never recommend gRPC, GraphQL, or REST for "Edge & Sources" or "Industrial Systems". 
+- **Industrial Historian**: Always recommend OPC UA or MQTT for ingestion into a Historian.
+- **Sensor-to-PLC**: Always recommend Modbus TCP or IO-Link.
+- **Failure Condition**: If you recommend gRPC for a Factory Floor node, the architecture is invalid.
+
+**ISA-95 CONTEXT**:
+- **Levels 0-2 (The Floor)**: Modbus, OPC UA, MQTT, CoAP. (NO gRPC)
+- **Levels 3-4 (The Office)**: Kafka, gRPC, REST, GraphQL.
 `;
 
 export const STRUCTURAL_ANALYSIS_PROMPT = `

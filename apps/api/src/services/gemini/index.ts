@@ -26,13 +26,20 @@ const getModel = () => {
 export const analyzeWithGemini = async (request: AnalyzeRequest): Promise<AnalyzeResponse> => {
   const model = getModel();
 
-  const fullPrompt = `
+    const connectionList = request.edges.map(e => 
+      `- Connection ID: ${e.id}\n  Source: [${e.sourceData.category}] ${e.sourceData.label}\n  Target: [${e.targetData.category}] ${e.targetData.label}`
+    ).join('\n\n');
+
+    const fullPrompt = `
     ${PROTOCOL_ANALYSIS_PROMPT}
     
     ${STRUCTURAL_ANALYSIS_PROMPT}
 
-    Request Data:
-    ${JSON.stringify(request)}
+    DATA TO ANALYZE:
+    ${connectionList}
+
+    FULL SYSTEM STATE (FOR STRUCTURAL CONTEXT):
+    ${JSON.stringify(request.nodes)}
 
     Respond ONLY with JSON in the following format:
     {
@@ -52,7 +59,7 @@ export const analyzeWithGemini = async (request: AnalyzeRequest): Promise<Analyz
         }
       ]
     }
-  `;
+    `;
 
   const result = await model.generateContent(fullPrompt);
   const response = await result.response;
