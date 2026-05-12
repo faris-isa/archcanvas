@@ -1,15 +1,33 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { VertexAI } from '@google-cloud/vertexai';
 import { AnalyzeRequest, AnalyzeResponse } from '@archcanvas/shared';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const API_KEY = process.env.GEMINI_API_KEY || '';
+const PROJECT_ID = process.env.GCLOUD_PROJECT || 'archcanvas-dev';
+const LOCATION = process.env.GCLOUD_LOCATION || 'us-central1';
 
 export const analyzeWithGemini = async (request: AnalyzeRequest): Promise<AnalyzeResponse> => {
-  const model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.0-flash',
-    generationConfig: {
-      responseMimeType: 'application/json',
-    }
-  });
+  let model: any;
+
+  if (API_KEY) {
+    // Use Google AI (AI Studio) with API Key
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+      }
+    });
+  } else {
+    // Use Vertex AI (Google Cloud) with ADC
+    const vertexAI = new VertexAI({ project: PROJECT_ID, location: LOCATION });
+    model = vertexAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+      }
+    });
+  }
 
   const prompt = `
     You are a Principal Data Architect. 
@@ -40,6 +58,10 @@ export const analyzeWithGemini = async (request: AnalyzeRequest): Promise<Analyz
   `;
 
   const result = await model.generateContent(prompt);
-  const responseText = result.response.text();
-  return JSON.parse(responseText) as AnalyzeResponse;
+  const response = await result.response;
+  const responseText = response.text();
+  
+  // Strip code blocks if AI included them
+  const cleanJson = responseText.replace(/```json\n?|\n?```/g, '').trim();
+  return JSON.parse(cleanJson) as AnalyzeResponse;
 };
