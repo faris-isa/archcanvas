@@ -1,4 +1,5 @@
 import React from 'react';
+import { Search, X } from 'lucide-react';
 import { PipelineList } from './PipelineList';
 import { getNodeIcon } from '../../utils/nodeIcons';
 
@@ -42,21 +43,53 @@ const NODE_TYPES = [
 ];
 
 export const NodeLibrary: React.FC = () => {
+  const [searchQuery, setSearchQuery] = React.useState('');
+
   const onDragStart = (event: React.DragEvent, nodeType: string, category: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.setData('application/category', category);
     event.dataTransfer.effectAllowed = 'move';
   };
 
+  const filteredNodeTypes = NODE_TYPES.map(cat => ({
+    ...cat,
+    types: cat.types.filter(type => 
+      type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cat.category.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(cat => cat.types.length > 0);
+
   return (
     <div className="w-72 bg-[var(--color-bg-secondary)] border-r border-[var(--color-border)] flex flex-col transition-colors duration-300">
-      <div className="p-6 border-b border-[var(--color-border)]">
-        <h2 className="text-2xl font-bold text-industrial-gold tracking-tight">Node Library</h2>
-        <p className="text-[10px] text-[var(--color-text-secondary)] uppercase tracking-[0.2em] mt-1 font-semibold">Architectural Components</p>
+      <div className="p-6 border-b border-[var(--color-border)] space-y-4">
+        <div>
+          <h2 className="text-2xl font-bold text-industrial-gold tracking-tight">Node Library</h2>
+          <p className="text-[10px] text-[var(--color-text-secondary)] uppercase tracking-[0.2em] mt-1 font-semibold">Architectural Components</p>
+        </div>
+
+        <div className="relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-industrial-gray group-focus-within:text-tech-accent transition-colors" size={14} />
+          <input
+            type="text"
+            placeholder="Search nodes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-[var(--color-bg-primary)]/40 border border-[var(--color-border)] rounded-md py-2 pl-9 pr-8 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-tech-accent/50 focus:ring-1 focus:ring-tech-accent/20 transition-all placeholder:text-industrial-gray"
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-industrial-gray hover:text-white transition-colors"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-8 scrollbar-thin scrollbar-thumb-[var(--color-border)]">
-        {NODE_TYPES.map((cat) => (
+        {filteredNodeTypes.length > 0 ? (
+          filteredNodeTypes.map((cat) => (
           <div key={cat.category} className="space-y-3">
             <h3 className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-text-secondary)] font-black flex items-center gap-2">
               <span className="w-1 h-1 bg-tech-accent rounded-full"></span>
@@ -83,7 +116,12 @@ export const NodeLibrary: React.FC = () => {
               ))}
             </div>
           </div>
-        ))}
+        )) : (
+          <div className="flex flex-col items-center justify-center py-10 text-center opacity-50">
+            <Search size={32} className="text-industrial-gray mb-2" />
+            <p className="text-xs text-industrial-gray">No nodes found matching "{searchQuery}"</p>
+          </div>
+        )}
       </div>
       
       <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-bg-primary)]/20">

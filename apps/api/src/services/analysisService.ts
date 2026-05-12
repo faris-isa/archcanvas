@@ -1,4 +1,4 @@
-import { analyzeWithGemini } from './geminiService';
+import { analyzeWithGemini } from './gemini';
 import { mockAnalyzeArchitecture } from './mockAnalysisService';
 import { AnalyzeRequest, AnalyzeResponse } from '@archcanvas/shared';
 
