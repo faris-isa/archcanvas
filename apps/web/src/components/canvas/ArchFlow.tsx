@@ -4,7 +4,6 @@ import {
   Controls,
   Background,
   useReactFlow,
-  ReactFlowProvider,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useCanvasStore } from '../../store/useCanvasStore';

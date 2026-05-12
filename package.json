@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "vp run -r dev",
-    "test": "vp run -r test"
+    "test": "vp run -r test",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

@@ -3,9 +3,11 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "vp build",
     "start": "node dist/index.js",
-    "test": "vp test run"
+    "test": "vp test run",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix"
   },
   "dependencies": {
     "@archcanvas/shared": "workspace:*",
