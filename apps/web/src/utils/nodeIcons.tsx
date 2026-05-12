@@ -81,6 +81,7 @@ const SPECIAL_LOGOS: Record<string, string> = {
   'slack': 'https://www.svgrepo.com/show/521850/slack.svg',
   'vector': 'https://www.svgrepo.com/show/354510/vector-timber.svg',
   'questdb': 'https://questdb.com/img/questdb-logo-themed.svg',
+
 };
 
 const getBrandIcon = (label: string, size: number = 18) => {

@@ -49,6 +49,10 @@ const NODE_TYPES = [
     types: ['ClickHouse', 'Snowflake', 'BigQuery', 'Elasticsearch'] 
   },
   { 
+    category: 'Business Intelligence', 
+    types: ['Power BI', 'Tableau', 'Looker', 'Custom Dashboard'] 
+  },
+  { 
     category: 'Sinks & Alerts', 
     types: ['Grafana Dashboard', 'Slack Webhook', 'Email Alert', 'High-Speed Sink'] 
   },
