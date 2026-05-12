@@ -91,13 +91,13 @@ const getBrandIcon = (label: string, size: number = 18) => {
     // We use a CSS filter to make the icons match our industrial theme (slightly dimmed/grayish until hover)
     return (
       <img 
-        src={`https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${slug}.svg`} 
+        src={`https://cdn.simpleicons.org/${slug}/ffffff`} 
         alt={label}
         style={{ 
           width: size, 
           height: size, 
         }}
-        className="brand-logo group-hover:scale-110 transition-transform duration-300"
+        className="group-hover:scale-110 transition-transform duration-300"
       />
     );
   }

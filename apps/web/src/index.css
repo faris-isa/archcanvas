@@ -75,12 +75,7 @@ body {
   @apply !stroke-gray-500/30;
 }
 
-/* Brand Logo Dark Mode Support */
-.brand-logo {
-  filter: invert(1) brightness(1.2);
-  transition: filter 0.3s ease;
-}
-
-:root.light .brand-logo {
-  filter: none;
+/* Brand Logo Support (CDN handled) */
+.group-hover\:scale-110 {
+  transition: transform 0.3s ease;
 }
