@@ -1,0 +1,39 @@
+steps:
+  # 1. Build and Push API image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/arch-api', '-f', 'apps/api/Dockerfile', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/arch-api']
+
+  # 2. Deploy API to Cloud Run to ensure we have a live URL
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'arch-api', '--image', 'gcr.io/$PROJECT_ID/arch-api', '--region', 'asia-southeast2', '--platform', 'managed', '--allow-unauthenticated']
+
+  # 3. Capture the API URL
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run services describe arch-api --region asia-southeast2 --format 'value(status.url)' > /workspace/api_url.txt
+
+  # 4. Build and Push Web image with the captured API URL
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        API_URL=$(cat /workspace/api_url.txt)
+        docker build -t gcr.io/$PROJECT_ID/arch-web -f apps/web/Dockerfile --build-arg VITE_API_URL=$$API_URL .
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/arch-web']
+
+  # 5. Deploy Web to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'arch-web', '--image', 'gcr.io/$PROJECT_ID/arch-web', '--region', 'asia-southeast2', '--platform', 'managed', '--allow-unauthenticated']
+
+images:
+  - 'gcr.io/$PROJECT_ID/arch-api'
+  - 'gcr.io/$PROJECT_ID/arch-web'
