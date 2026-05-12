@@ -224,6 +224,7 @@ export const NODE_SCHEMAS: Record<string, NodeSchema> = {
   'Looker': ANALYTICS_PROPERTIES,
   'Custom Dashboard': CORE_PROPERTIES,
 
+
   // Sinks & Alerts
   'Grafana Dashboard': CORE_PROPERTIES,
   'Elasticsearch': STORAGE_PROPERTIES,
