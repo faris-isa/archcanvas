@@ -2,7 +2,7 @@
   "name": "@archcanvas/api",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx --env-file .env watch src/index.ts",
     "build": "vp build",
     "start": "node dist/index.js",
     "test": "vp test run",
