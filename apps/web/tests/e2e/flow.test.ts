@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { apiClient } from '../../api/client';
+import { apiClient } from '../../src/api/client';
 
 // Mock the apiClient
-vi.mock('../../api/client', () => ({
+vi.mock('../../src/api/client', () => ({
   apiClient: {
     analyzeArchitecture: vi.fn(),
     createPipeline: vi.fn(),
@@ -28,7 +28,7 @@ describe('Frontend Flow Integration', () => {
   it('should call createPipeline when saving', async () => {
     (apiClient.createPipeline as any).mockResolvedValue({ id: 'p1', name: 'Test' });
     
-    await apiClient.createPipeline('Test', '{}');
-    expect(apiClient.createPipeline).toHaveBeenCalledWith('Test', '{}');
+    await apiClient.createPipeline('Test', {});
+    expect(apiClient.createPipeline).toHaveBeenCalledWith('Test', {});
   });
 });

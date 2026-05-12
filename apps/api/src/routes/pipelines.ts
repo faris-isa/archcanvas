@@ -1,64 +1,42 @@
 import { Hono } from 'hono'
-import { 
-  createPipeline, 
-  getPipelines, 
-  getPipelineById, 
-  updatePipeline, 
-  deletePipeline 
-} from '../db/queries'
+import { pipelineService } from '../firebase/pipelineService'
 import { PipelineSummary, PipelineDetail } from '@archcanvas/shared'
 
 const pipelines = new Hono()
 
 pipelines.get('/', async (c) => {
-  const list = await getPipelines()
-  const summaries: PipelineSummary[] = list.map(p => ({
-    id: p.id,
-    name: p.name,
-    createdAt: p.createdAt.toISOString(),
-    updatedAt: p.updatedAt.toISOString(),
-  }))
+  const summaries = await pipelineService.listPipelines()
   return c.json(summaries)
 })
 
 pipelines.get('/:id', async (c) => {
   const id = c.req.param('id')
-  const p = await getPipelineById(id)
+  const p = await pipelineService.getPipeline(id)
   if (!p) return c.json({ error: 'Not Found' }, 404)
-  
-  const detail: PipelineDetail = {
-    id: p.id,
-    name: p.name,
-    canvasState: p.canvasState,
-    createdAt: p.createdAt.toISOString(),
-    updatedAt: p.updatedAt.toISOString(),
-  }
-  return c.json(detail)
+  return c.json(p)
 })
 
 pipelines.post('/', async (c) => {
   const body = await c.req.json()
-  const id = `pipe-${Date.now()}`
-  const newP = await createPipeline({
-    id,
-    name: body.name || 'Untitled Pipeline',
-    canvasState: body.canvasState || JSON.stringify({ nodes: [], edges: [] }),
-  })
+  const id = await pipelineService.createPipeline(
+    body.name || 'Untitled Pipeline',
+    body.canvasState || { nodes: [], edges: [] }
+  )
+  const newP = await pipelineService.getPipeline(id)
   return c.json(newP, 201)
 })
 
 pipelines.put('/:id', async (c) => {
   const id = c.req.param('id')
   const body = await c.req.json()
-  const updated = await updatePipeline(id, body)
-  if (!updated) return c.json({ error: 'Not Found' }, 404)
+  await pipelineService.updatePipeline(id, body.name, body.canvasState)
+  const updated = await pipelineService.getPipeline(id)
   return c.json(updated)
 })
 
 pipelines.delete('/:id', async (c) => {
   const id = c.req.param('id')
-  const deleted = await deletePipeline(id)
-  if (!deleted) return c.json({ error: 'Not Found' }, 404)
+  await pipelineService.deletePipeline(id)
   return c.json({ success: true }, 200)
 })
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { PipelineSummary } from '@archcanvas/shared';
+import type { PipelineSummary } from '@archcanvas/shared';
 import { useReactFlow } from '@xyflow/react';
 import { useCanvasStore } from '../../store/useCanvasStore';
 import { apiClient } from '../../api/client';
@@ -29,7 +29,7 @@ export const PipelineList: React.FC = () => {
     setLoading(true);
     try {
       const data = await apiClient.getPipeline(id);
-      const flow = JSON.parse(data.canvasState);
+      const flow = data.canvasState;
       
       if (flow) {
         const { x = 0, y = 0, zoom = 1 } = flow.viewport || {};

@@ -4,13 +4,15 @@ import {
   Controls,
   Background,
   useReactFlow,
-  ReactFlowProvider,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useCanvasStore } from '../../store/useCanvasStore';
-import { IntentValues } from '@archcanvas/shared';
+import type { IntentValues } from '@archcanvas/shared';
 import IntentNode from '../nodes/IntentNode';
 import ProtocolEdge from './ProtocolEdge';
+
+import { useTheme } from '../../hooks/useTheme';
+import { getDefaultProperties } from '../../config/nodeSchemas';
 
 const nodeTypes = {
   intentNode: IntentNode,
@@ -20,15 +22,9 @@ const edgeTypes = {
   protocolEdge: ProtocolEdge,
 };
 
-const DEFAULT_INTENT: IntentValues = {
-  'throughput-rate': 'medium',
-  'environment': 'cloud',
-  'latency-tolerance': 'medium',
-  'network-reliability': 'stable',
-};
-
 export const ArchFlow: React.FC = () => {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } = useCanvasStore();
+  const { theme } = useTheme();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition } = useReactFlow();
 
@@ -60,7 +56,7 @@ export const ArchFlow: React.FC = () => {
         data: { 
           label: type, 
           category, 
-          intentProperties: { ...DEFAULT_INTENT } 
+          intentProperties: getDefaultProperties(type)
         },
       };
 
@@ -82,10 +78,13 @@ export const ArchFlow: React.FC = () => {
         onConnect={onConnect}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        deleteKeyCode={['Backspace', 'Delete']}
+        multiSelectionKeyCode="Control"
+        selectionKeyCode="Shift"
         fitView
       >
         <Controls />
-        <Background color="#333" gap={16} />
+        <Background color={theme === 'dark' ? '#555' : '#aaa'} gap={16} />
       </ReactFlow>
     </div>
   );

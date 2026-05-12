@@ -26,6 +26,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+dummy-credentials.json
 
 # Database
 *.sqlite
@@ -38,4 +39,7 @@ test-results/
 
 # Sisyphus
 .sisyphus/evidence/
-.sisyphus/logs/
+.sisyphus/logs/sdk/
+
+# Local SDKs
+sdk/

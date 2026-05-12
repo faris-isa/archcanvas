@@ -1,11 +1,6 @@
-export type IntentProperty = 'throughput-rate' | 'environment' | 'latency-tolerance' | 'network-reliability';
+export type IntentProperty = string;
 
-export type IntentValues = {
-  'throughput-rate': 'high' | 'medium' | 'low';
-  'environment': 'edge' | 'cloud';
-  'latency-tolerance': 'low' | 'medium' | 'high';
-  'network-reliability': 'stable' | 'unstable' | 'volatile';
-};
+export type IntentValues = Record<string, string>;
 
 export type ArchNodeData = {
   label: string;
@@ -42,7 +37,7 @@ export type PipelineSummary = {
 export type PipelineDetail = {
   id: string;
   name: string;
-  canvasState: string;
+  canvasState: any; // Native JSON object from Firestore
   createdAt: string;
   updatedAt: string;
 };

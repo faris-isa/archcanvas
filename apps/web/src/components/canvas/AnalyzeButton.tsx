@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCanvasStore } from '../../store/useCanvasStore';
-import { AnalyzeRequest } from '@archcanvas/shared';
+import type { AnalyzeRequest } from '@archcanvas/shared';
 import { apiClient } from '../../api/client';
 
 export const AnalyzeButton: React.FC = () => {
@@ -46,23 +46,50 @@ export const AnalyzeButton: React.FC = () => {
     }
   };
 
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        if (!loading && edges.length > 0) {
+          event.preventDefault();
+          onAnalyze();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [loading, edges, nodes]);
+
   return (
     <div className="flex flex-col items-end gap-2">
       {mockMode && (
-        <div className="text-[10px] bg-amber-900/50 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 font-bold uppercase tracking-widest">
+        <div className="text-[10px] bg-amber-900/50 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 font-bold uppercase tracking-widest animate-pulse">
           Mock Mode Active
         </div>
       )}
       <button
         onClick={onAnalyze}
         disabled={loading || edges.length === 0}
-        className={`px-4 py-1.5 rounded text-sm font-bold transition-colors ${
+        title="Shortcut: Ctrl + Enter"
+        className={`group relative px-4 py-1.5 rounded text-sm font-bold transition-all duration-300 ${
           loading || edges.length === 0
             ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-            : 'bg-tech-accent text-white hover:bg-blue-600'
+            : 'bg-tech-accent text-white hover:bg-blue-600 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]'
         }`}
       >
-        {loading ? 'Analyzing...' : 'Analyze Architecture'}
+        <div className="flex items-center gap-2">
+          {loading ? 'Analyzing...' : 'Analyze Architecture'}
+          {!loading && edges.length > 0 && (
+            <span className="text-[10px] opacity-50 font-mono group-hover:opacity-100 transition-opacity">
+              Ctrl + ↵
+            </span>
+          )}
+        </div>
+        
+        {/* Glow effect on hover */}
+        {!loading && edges.length > 0 && (
+          <div className="absolute inset-0 rounded bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+        )}
       </button>
     </div>
   );
