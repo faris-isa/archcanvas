@@ -31,10 +31,70 @@ import {
   CloudCog
 } from 'lucide-react';
 
+const BRAND_LOGOS: Record<string, string> = {
+  'kafka': 'apachekafka',
+  'influx': 'influxdb',
+  'prometheus': 'prometheus',
+  'postgres': 'postgresql',
+  'mysql': 'mysql',
+  'cassandra': 'apachecassandra',
+  'redis': 'redis',
+  'mongo': 'mongodb',
+  'clickhouse': 'clickhouse',
+  'snowflake': 'snowflake',
+  'bigquery': 'googlebigquery',
+  'elasticsearch': 'elasticsearch',
+  'slack': 'slack',
+  'grafana': 'grafana',
+  'telegraf': 'influxdb',
+  'fluentd': 'fluentd',
+  'vector': 'vector',
+  'rabbitmq': 'rabbitmq',
+  'nats': 'nats',
+  'pulsar': 'apachepulsar',
+  'spark': 'apachespark',
+  'flink': 'apacheflink',
+  'lambda': 'awslambda',
+  'pub/sub': 'googlecloud',
+  'google': 'googlecloud',
+  'aws': 'amazonaws',
+  'azure': 'microsoftazure',
+  'python': 'python',
+  'nodejs': 'nodedotjs',
+  'react': 'react',
+};
+
+const getBrandIcon = (label: string, size: number = 18) => {
+  const l = label.toLowerCase();
+  const brandKey = Object.keys(BRAND_LOGOS).find(key => l.includes(key));
+  
+  if (brandKey) {
+    const slug = BRAND_LOGOS[brandKey];
+    // We use a CSS filter to make the icons match our industrial theme (slightly dimmed/grayish until hover)
+    return (
+      <img 
+        src={`https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${slug}.svg`} 
+        alt={label}
+        style={{ 
+          width: size, 
+          height: size, 
+          filter: 'brightness(0.8) grayscale(0.2)',
+        }}
+        className="group-hover:filter-none transition-all duration-300"
+      />
+    );
+  }
+  return null;
+};
+
 export const getNodeIcon = (label: string) => {
   const l = label.toLowerCase();
   
-  // Edge / Sources
+  // Try to get a brand logo first
+  const brandIcon = getBrandIcon(label);
+  if (brandIcon) return brandIcon;
+
+  // Fallback to Lucide for generic components
   if (l.includes('sensor')) return <Activity size={18} />;
   if (l.includes('plc')) return <Cpu size={18} />;
   if (l.includes('gateway')) return <Zap size={18} />;
@@ -50,45 +110,19 @@ export const getNodeIcon = (label: string) => {
   if (l.includes('api')) return <Globe size={18} />;
 
   // Agents & Collectors
-  if (l.includes('telegraf')) return <Compass size={18} />;
-  if (l.includes('fluentd')) return <Box size={18} />;
-  if (l.includes('vector')) return <Zap size={18} />;
   if (l.includes('agent')) return <CloudCog size={18} />;
 
-  // Transport / Streaming
-  if (l.includes('kafka')) return <Waves size={18} />;
-  if (l.includes('pulsar')) return <Waves size={18} />;
-  if (l.includes('broker')) return <Share2 size={18} />;
-  if (l.includes('rabbitmq')) return <Share2 size={18} />;
-  if (l.includes('nats')) return <Share2 size={18} />;
-  if (l.includes('pub/sub')) return <Cloud size={18} />;
+  // Processing & Streams
   if (l.includes('stream')) return <Waves size={18} />;
-
-  // Processing
-  if (l.includes('spark')) return <Layers size={18} />;
-  if (l.includes('flink')) return <Layers size={18} />;
-  if (l.includes('lambda')) return <Terminal size={18} />;
-  if (l.includes('function')) return <Terminal size={18} />;
   if (l.includes('script')) return <Terminal size={18} />;
+  if (l.includes('function')) return <Terminal size={18} />;
 
   // Storage
-  if (l.includes('influx')) return <Gauge size={18} />;
-  if (l.includes('prometheus')) return <Gauge size={18} />;
-  if (l.includes('postgres')) return <Database size={18} />;
-  if (l.includes('cassandra')) return <HardDrive size={18} />;
-  if (l.includes('redis')) return <Zap size={18} />;
-  if (l.includes('mongo')) return <FileJson size={18} />;
-  if (l.includes('clickhouse')) return <Table size={18} />;
-  if (l.includes('snowflake')) return <Microscope size={18} />;
-  if (l.includes('bigquery')) return <Microscope size={18} />;
   if (l.includes('data lake')) return <Cloud size={18} />;
   if (l.includes('db')) return <Database size={18} />;
 
   // Sinks / Visuals
-  if (l.includes('grafana')) return <Monitor size={18} />;
   if (l.includes('dashboard')) return <Monitor size={18} />;
-  if (l.includes('elastic')) return <Search size={18} />;
-  if (l.includes('slack')) return <MessageSquare size={18} />;
   if (l.includes('mail')) return <Mail size={18} />;
   if (l.includes('alert')) return <Bell size={18} />;
 
