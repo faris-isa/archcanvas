@@ -33,7 +33,8 @@ import {
   Lock,
   History,
   Copy,
-  Layout
+  Layout,
+  Network
 } from 'lucide-react';
 
 const BRAND_LOGOS: Record<string, string> = {
@@ -140,6 +141,7 @@ export const getNodeIcon = (label: string) => {
   // Connectivity & Security
   if (l.includes('firewall')) return <Shield size={18} />;
   if (l.includes('vpn')) return <Lock size={18} />;
+  if (l.includes('metro')) return <Network size={18} />;
   if (l.includes('twin')) return <Copy size={18} />;
   if (l.includes('management')) return <CloudCog size={18} />;
 

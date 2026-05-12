@@ -14,7 +14,7 @@ const NODE_TYPES = [
   },
   { 
     category: 'Connectivity & Security', 
-    types: ['Industrial Firewall', 'VPN Tunnel', 'Device Management', 'Digital Twin'] 
+    types: ['Industrial Firewall', 'VPN Tunnel', 'Device Management', 'Metro WAN', 'Digital Twin'] 
   },
   { 
     category: 'Applications & Clients', 
