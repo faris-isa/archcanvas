@@ -40,3 +40,6 @@ test-results/
 # Sisyphus
 .sisyphus/evidence/
 .sisyphus/logs/sdk/
+
+# Local SDKs
+sdk/
