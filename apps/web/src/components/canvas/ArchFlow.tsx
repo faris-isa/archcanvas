@@ -78,6 +78,9 @@ export const ArchFlow: React.FC = () => {
         onConnect={onConnect}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        deleteKeyCode={['Backspace', 'Delete']}
+        multiSelectionKeyCode="Control"
+        selectionKeyCode="Shift"
         fitView
       >
         <Controls />
