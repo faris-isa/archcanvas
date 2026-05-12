@@ -71,6 +71,8 @@ const BRAND_LOGOS: Record<string, string> = {
   'questdb': 'questdb',
   'victoria': 'victoriametrics',
   'druid': 'apachedruid',
+  'scada': 'inductiveautomation',
+  'ignition': 'inductiveautomation',
 };
 
 const SPECIAL_LOGOS: Record<string, string> = {
@@ -165,6 +167,7 @@ export const getNodeIcon = (label: string) => {
   if (l.includes('metro')) return <Network size={18} />;
   if (l.includes('twin')) return <Copy size={18} />;
   if (l.includes('management')) return <CloudCog size={18} />;
+
 
   // Sinks / Visuals
   if (l.includes('dashboard')) return <Monitor size={18} />;

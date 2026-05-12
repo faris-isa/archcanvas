@@ -5,6 +5,7 @@ import { NODE_TYPES } from '../../config/nodeTypes';
 import { getNodeIcon } from '../../utils/nodeIcons';
 import { useCanvasStore } from '../../store/useCanvasStore';
 
+
 export const NodeLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const leftSidebarOpen = useCanvasStore((state) => state.leftSidebarOpen);
