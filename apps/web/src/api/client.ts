@@ -16,9 +16,11 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json();
 }
 
+const BASE_URL = import.meta.env.VITE_API_URL || '';
+
 export const apiClient = {
   async analyzeArchitecture(request: AnalyzeRequest): Promise<AnalyzeResponse> {
-    const res = await fetch('/api/analyze-architecture', {
+    const res = await fetch(`${BASE_URL}/api/analyze-architecture`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),
@@ -27,17 +29,17 @@ export const apiClient = {
   },
 
   async listPipelines(): Promise<PipelineSummary[]> {
-    const res = await fetch('/api/pipelines');
+    const res = await fetch(`${BASE_URL}/api/pipelines`);
     return handleResponse<PipelineSummary[]>(res);
   },
 
   async getPipeline(id: string): Promise<PipelineDetail> {
-    const res = await fetch(`/api/pipelines/${id}`);
+    const res = await fetch(`${BASE_URL}/api/pipelines/${id}`);
     return handleResponse<PipelineDetail>(res);
   },
 
   async createPipeline(name: string, canvasState: any): Promise<PipelineDetail> {
-    const res = await fetch('/api/pipelines', {
+    const res = await fetch(`${BASE_URL}/api/pipelines`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, canvasState }),
@@ -46,7 +48,7 @@ export const apiClient = {
   },
 
   async updatePipeline(id: string, data: Partial<{ name: string; canvasState: any }>): Promise<PipelineDetail> {
-    const res = await fetch(`/api/pipelines/${id}`, {
+    const res = await fetch(`${BASE_URL}/api/pipelines/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -55,7 +57,7 @@ export const apiClient = {
   },
 
   async deletePipeline(id: string): Promise<void> {
-    const res = await fetch(`/api/pipelines/${id}`, {
+    const res = await fetch(`${BASE_URL}/api/pipelines/${id}`, {
       method: 'DELETE',
     });
     if (!res.ok) {
