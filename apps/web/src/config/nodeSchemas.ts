@@ -199,7 +199,11 @@ export const NODE_SCHEMAS: Record<string, NodeSchema> = {
   'ClickHouse': ANALYTICS_PROPERTIES,
   'Snowflake': ANALYTICS_PROPERTIES,
   'BigQuery': ANALYTICS_PROPERTIES,
-  'Time-Series DB': TSDB_PROPERTIES,
+  'TimescaleDB': TSDB_PROPERTIES,
+  'QuestDB': TSDB_PROPERTIES,
+  'VictoriaMetrics': TSDB_PROPERTIES,
+  'Apache Druid': TSDB_PROPERTIES,
+  'kdb+': TSDB_PROPERTIES,
   'Data Lake': STORAGE_PROPERTIES,
 
   // Industrial & Connectivity

@@ -34,7 +34,7 @@ const NODE_TYPES = [
   },
   { 
     category: 'Time-Series & Metrics', 
-    types: ['InfluxDB', 'Prometheus', 'Time-Series DB', 'Redis Cache'] 
+    types: ['InfluxDB', 'Prometheus', 'TimescaleDB', 'QuestDB', 'VictoriaMetrics', 'Apache Druid', 'kdb+', 'Redis Cache'] 
   },
   { 
     category: 'Databases & Storage', 

@@ -75,6 +75,10 @@ const BRAND_LOGOS: Record<string, string> = {
   'power bi': 'powerbi',
   'tableau': 'tableau',
   'looker': 'looker',
+  'timescale': 'timescaledb',
+  'questdb': 'questdb',
+  'victoria': 'victoriametrics',
+  'druid': 'apachedruid',
 };
 
 const getBrandIcon = (label: string, size: number = 18) => {
@@ -132,6 +136,7 @@ export const getNodeIcon = (label: string) => {
   // Storage
   if (l.includes('data lake')) return <Cloud size={18} />;
   if (l.includes('db')) return <Database size={18} />;
+  if (l.includes('kdb')) return <Gauge size={18} />;
 
   // Industrial Systems (SCADA/MES)
   if (l.includes('scada')) return <Layout size={18} />;
