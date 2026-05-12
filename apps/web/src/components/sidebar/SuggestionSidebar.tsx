@@ -3,7 +3,7 @@ import { useCanvasStore } from '../../store/useCanvasStore';
 import { Lightbulb, Plus, AlertTriangle, Info } from 'lucide-react';
 
 export const SuggestionSidebar: React.FC = () => {
-  const { suggestions } = useCanvasStore();
+  const { suggestions, addNodeByType } = useCanvasStore();
 
   if (suggestions.length === 0) {
     return (
@@ -53,7 +53,10 @@ export const SuggestionSidebar: React.FC = () => {
             </p>
 
             {suggestion.suggestedNodeType && (
-              <button className="mt-3 w-full flex items-center justify-center gap-2 py-1.5 rounded bg-industrial-gray/30 border border-industrial-gray hover:bg-industrial-gold/10 hover:border-industrial-gold/50 transition-all text-[10px] font-bold text-gray-300 hover:text-industrial-gold">
+              <button 
+                onClick={() => addNodeByType(suggestion.suggestedNodeType!)}
+                className="mt-3 w-full flex items-center justify-center gap-2 py-1.5 rounded bg-industrial-gray/30 border border-industrial-gray hover:bg-industrial-gold/10 hover:border-industrial-gold/50 transition-all text-[10px] font-bold text-gray-300 hover:text-industrial-gold"
+              >
                 <Plus size={12} />
                 Add {suggestion.suggestedNodeType}
               </button>

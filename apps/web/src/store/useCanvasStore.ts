@@ -12,6 +12,7 @@ import {
   type Connection
 } from '@xyflow/react'
 import type { ArchNodeData } from '@archcanvas/shared'
+import { getDefaultProperties } from '../config/nodeSchemas'
 
 interface CanvasState {
   nodes: Node<ArchNodeData>[];
@@ -20,6 +21,7 @@ interface CanvasState {
   onEdgesChange: OnEdgesChange;
   onConnect: (connection: Connection) => void;
   addNode: (node: Node<ArchNodeData>) => void;
+  addNodeByType: (type: string) => void;
   updateNodeData: (nodeId: string, data: Partial<ArchNodeData>) => void;
   setAnalysisResults: (edges: { edgeId: string; recommendedProtocol: string; engineeringExplanation: string }[], suggestions?: { title: string; description: string; suggestedNodeType?: string; priority: 'low' | 'medium' | 'high' }[]) => void;
   suggestions: { title: string; description: string; suggestedNodeType?: string; priority: 'low' | 'medium' | 'high' }[];
@@ -51,6 +53,22 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   addNode: (node: Node<ArchNodeData>) => {
     set({
       nodes: [...get().nodes, node],
+    });
+  },
+
+  addNodeByType: (type: string) => {
+    const newNode: Node<ArchNodeData> = {
+      id: `${type}-${Date.now()}`,
+      type: 'intentNode',
+      position: { x: 100 + Math.random() * 200, y: 100 + Math.random() * 200 },
+      data: { 
+        label: type, 
+        category: 'Suggested', 
+        intentProperties: getDefaultProperties(type)
+      },
+    };
+    set({
+      nodes: [...get().nodes, newNode],
     });
   },
 
