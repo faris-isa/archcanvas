@@ -12,6 +12,7 @@ import IntentNode from '../nodes/IntentNode';
 import ProtocolEdge from './ProtocolEdge';
 
 import { useTheme } from '../../hooks/useTheme';
+import { getDefaultProperties } from '../../config/nodeSchemas';
 
 const nodeTypes = {
   intentNode: IntentNode,
@@ -19,13 +20,6 @@ const nodeTypes = {
 
 const edgeTypes = {
   protocolEdge: ProtocolEdge,
-};
-
-const DEFAULT_INTENT: IntentValues = {
-  'throughput-rate': 'medium',
-  'environment': 'cloud',
-  'latency-tolerance': 'medium',
-  'network-reliability': 'stable',
 };
 
 export const ArchFlow: React.FC = () => {
@@ -62,7 +56,7 @@ export const ArchFlow: React.FC = () => {
         data: { 
           label: type, 
           category, 
-          intentProperties: { ...DEFAULT_INTENT } 
+          intentProperties: getDefaultProperties(type)
         },
       };
 
