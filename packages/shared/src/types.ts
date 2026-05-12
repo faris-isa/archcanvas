@@ -1,11 +1,6 @@
-export type IntentProperty = 'throughput-rate' | 'environment' | 'latency-tolerance' | 'network-reliability';
+export type IntentProperty = string;
 
-export type IntentValues = {
-  'throughput-rate': 'high' | 'medium' | 'low';
-  'environment': 'edge' | 'cloud';
-  'latency-tolerance': 'low' | 'medium' | 'high';
-  'network-reliability': 'stable' | 'unstable' | 'volatile';
-};
+export type IntentValues = Record<string, string>;
 
 export type ArchNodeData = {
   label: string;
