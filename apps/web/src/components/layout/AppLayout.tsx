@@ -3,6 +3,7 @@ import { NodeLibrary } from '../sidebar/NodeLibrary';
 import { AnalyzeButton } from '../canvas/AnalyzeButton';
 import { SaveButton } from '../canvas/SaveButton';
 import { PropertyPanel } from '../canvas/PropertyPanel';
+import { SuggestionSidebar } from '../sidebar/SuggestionSidebar';
 
 import { ThemeToggle } from '../common/ThemeToggle';
 
@@ -25,7 +26,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <SaveButton />
           </div>
         </header>
-        {children}
+        <div className="flex-1 flex overflow-hidden">
+          {children}
+          <SuggestionSidebar />
+        </div>
       </main>
       <PropertyPanel />
     </div>
