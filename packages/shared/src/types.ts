@@ -19,13 +19,19 @@ export type AnalyzeRequest = {
   }[];
 };
 
-export type AnalyzeResponse = {
+export interface AnalyzeResponse {
   edges: {
     edgeId: string;
     recommendedProtocol: string;
     engineeringExplanation: string;
   }[];
-};
+  suggestions?: {
+    title: string;
+    description: string;
+    suggestedNodeType?: string;
+    priority: 'low' | 'medium' | 'high';
+  }[];
+}
 
 export type PipelineSummary = {
   id: string;

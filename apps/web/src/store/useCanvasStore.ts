@@ -21,12 +21,14 @@ interface CanvasState {
   onConnect: (connection: Connection) => void;
   addNode: (node: Node<ArchNodeData>) => void;
   updateNodeData: (nodeId: string, data: Partial<ArchNodeData>) => void;
-  setAnalysisResults: (results: { edgeId: string; recommendedProtocol: string; engineeringExplanation: string }[]) => void;
+  setAnalysisResults: (edges: { edgeId: string; recommendedProtocol: string; engineeringExplanation: string }[], suggestions?: { title: string; description: string; suggestedNodeType?: string; priority: 'low' | 'medium' | 'high' }[]) => void;
+  suggestions: { title: string; description: string; suggestedNodeType?: string; priority: 'low' | 'medium' | 'high' }[];
 }
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
   nodes: [],
   edges: [],
+  suggestions: [],
 
   onNodesChange: (changes: NodeChange<Node<ArchNodeData>>[]) => {
     set({
@@ -75,10 +77,11 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     });
   },
 
-  setAnalysisResults: (results) => {
+  setAnalysisResults: (edges, suggestions) => {
     set({
+      suggestions: suggestions || [],
       edges: get().edges.map((edge) => {
-        const result = results.find((r) => r.edgeId === edge.id);
+        const result = edges.find((r) => r.edgeId === edge.id);
         if (result) {
           return {
             ...edge,
