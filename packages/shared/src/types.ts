@@ -6,6 +6,24 @@ export type ArchNodeData = {
   label: string;
   category: string;
   intentProperties: IntentValues;
+  templateId?: string; // Reference to custom template if applicable
+};
+
+export type CustomAttribute = {
+  name: string;
+  label: string;
+  type: "select" | "text";
+  options?: string[];
+  default: string;
+  description?: string;
+};
+
+export type CustomNodeTemplate = {
+  id: string;
+  name: string;
+  category: string;
+  icon?: string;
+  attributes: CustomAttribute[];
 };
 
 export type AnalyzeRequest = {
@@ -31,6 +49,10 @@ export interface AnalyzeResponse {
     description: string;
     suggestedNodeType?: string;
     priority: "low" | "medium" | "high";
+  }[];
+  grouping?: {
+    nodeId: string;
+    groupLabel: string;
   }[];
 }
 

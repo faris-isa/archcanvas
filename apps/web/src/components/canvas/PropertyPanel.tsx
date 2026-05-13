@@ -3,7 +3,7 @@ import { useOnSelectionChange } from "@xyflow/react";
 import type { Node } from "@xyflow/react";
 import { useCanvasStore } from "../../store/useCanvasStore";
 import type { ArchNodeData, IntentProperty } from "@archcanvas/shared";
-import { ChevronLeft, ChevronRight, Settings2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Settings2, X, Info } from "lucide-react";
 
 interface PropertyPanelProps {
   forceOpen?: boolean;
@@ -14,7 +14,11 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const effectiveOpen = forceOpen || isOpen;
-  const updateNodeData = useCanvasStore((s) => s.updateNodeData);
+  const { updateNodeData, customTemplates } = useCanvasStore();
+
+  const selectedTemplate = selectedNode?.data.templateId
+    ? customTemplates.find((t) => t.id === selectedNode.data.templateId)
+    : null;
 
   useOnSelectionChange({
     onChange: ({ nodes }) => {
@@ -33,6 +37,38 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
         [prop]: value as any,
       },
     });
+  };
+
+  const getOptions = (prop: string): string[] => {
+    if (selectedTemplate) {
+      const attr = selectedTemplate.attributes.find((a) => a.name === prop);
+      return attr?.options || [];
+    }
+    return getOptionsForProp(prop);
+  };
+
+  const getAttributeType = (prop: string): "select" | "text" => {
+    if (selectedTemplate) {
+      const attr = selectedTemplate.attributes.find((a) => a.name === prop);
+      return attr?.type || "select";
+    }
+    return "select";
+  };
+
+  const getLabel = (prop: string): string => {
+    if (selectedTemplate) {
+      const attr = selectedTemplate.attributes.find((a) => a.name === prop);
+      return attr?.label || prop;
+    }
+    return getLabelForProp(prop);
+  };
+
+  const getDescription = (prop: string): string | undefined => {
+    if (selectedTemplate) {
+      const attr = selectedTemplate.attributes.find((a) => a.name === prop);
+      return attr?.description;
+    }
+    return getDescriptionForProp(prop);
   };
 
   return (
@@ -86,7 +122,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
             <div className="p-6 border-b border-[var(--color-border)] bg-[var(--color-bg-primary)]/50 flex-shrink-0 relative">
               <div className="flex flex-col gap-1 pr-8">
                 <span className="text-[10px] uppercase tracking-widest text-tech-accent font-black">
-                  Node Configuration
+                  {selectedTemplate ? "Custom Component" : "Node Configuration"}
                 </span>
                 <h2 className="text-xl font-bold text-[var(--color-text-primary)] leading-tight">
                   {selectedNode.data.label}
@@ -97,7 +133,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+                className="absolute top-4 right-4 p-1 text-[var(--color-text-secondary)] hover:text-white transition-colors"
               >
                 <X size={16} />
               </button>
@@ -108,27 +144,53 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
                 Object.entries(selectedNode.data.intentProperties) as [IntentProperty, string][]
               ).map(([prop, value]) => (
                 <div key={prop} className="flex flex-col gap-3">
-                  <label className="text-xs font-bold text-[var(--color-text-secondary)] flex items-center justify-between uppercase tracking-wider">
-                    {prop.replace("-", " ")}
-                    <span className="text-[9px] px-1.5 py-0.5 bg-[var(--color-bg-primary)] rounded border border-[var(--color-border)] text-tech-accent font-mono">
-                      INTENT
-                    </span>
-                  </label>
-                  <div className="grid grid-cols-1 gap-1.5">
-                    {getOptionsForProp(prop).map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => onPropertyChange(prop, opt)}
-                        className={`py-2 text-[10px] font-bold rounded border transition-all uppercase tracking-widest ${
-                          value === opt
-                            ? "bg-tech-accent border-tech-accent text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]"
-                            : "bg-[var(--color-bg-primary)]/40 border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-tech-accent/50"
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-[var(--color-text-secondary)] flex items-center justify-between uppercase tracking-wider">
+                      <div className="flex items-center gap-2">
+                        {getLabel(prop)}
+                        {getDescription(prop) && (
+                          <div className="group/tooltip relative inline-block">
+                            <Info
+                              size={12}
+                              className="text-tech-accent/40 hover:text-tech-accent transition-colors cursor-help"
+                            />
+                            <div className="absolute left-0 bottom-full mb-2 w-48 p-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded shadow-2xl text-[10px] text-[var(--color-text-primary)] leading-relaxed opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-all z-50 normal-case font-medium">
+                              {getDescription(prop)}
+                              <div className="absolute left-2 top-full border-4 border-transparent border-t-[var(--color-border)]"></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[9px] px-1.5 py-0.5 bg-[var(--color-bg-primary)] rounded border border-[var(--color-border)] text-tech-accent font-mono">
+                        {selectedTemplate ? "CUSTOM" : "INTENT"}
+                      </span>
+                    </label>
                   </div>
+
+                  {getAttributeType(prop) === "select" ? (
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {getOptions(prop).map((opt) => (
+                        <button
+                          key={opt}
+                          onClick={() => onPropertyChange(prop, opt)}
+                          className={`py-2 text-[10px] font-bold rounded border transition-all uppercase tracking-widest ${
+                            value === opt
+                              ? "bg-tech-accent border-tech-accent text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]"
+                              : "bg-[var(--color-bg-primary)]/40 border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-tech-accent/50"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      value={value}
+                      onChange={(e) => onPropertyChange(prop, e.target.value)}
+                      className="w-full bg-[var(--color-bg-primary)]/40 border border-[var(--color-border)] rounded py-2 px-3 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-tech-accent/50 transition-all"
+                    />
+                  )}
                 </div>
               ))}
 
@@ -166,7 +228,12 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
   );
 };
 
-function getOptionsForProp(prop: IntentProperty): string[] {
+function getOptionsForProp(prop: string): string[] {
+  const schema = NODE_SCHEMAS[prop] || Object.values(NODE_SCHEMAS).find((s) => s[prop])?.[prop];
+  if (schema && typeof schema !== "string" && "options" in schema) {
+    return (schema as any).options;
+  }
+
   switch (prop) {
     case "throughput-rate":
       return ["low", "medium", "high"];
@@ -189,4 +256,20 @@ function getOptionsForProp(prop: IntentProperty): string[] {
     default:
       return [];
   }
+}
+
+function getLabelForProp(prop: string): string {
+  // Try to find in NODE_SCHEMAS
+  for (const schema of Object.values(NODE_SCHEMAS)) {
+    if (schema[prop]) return schema[prop].label;
+  }
+  return prop.replace("-", " ");
+}
+
+function getDescriptionForProp(prop: string): string | undefined {
+  // Try to find in NODE_SCHEMAS
+  for (const schema of Object.values(NODE_SCHEMAS)) {
+    if (schema[prop]) return schema[prop].description;
+  }
+  return undefined;
 }
