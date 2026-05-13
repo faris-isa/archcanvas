@@ -1,18 +1,18 @@
-import { create } from 'zustand'
-import { 
-  applyNodeChanges, 
-  applyEdgeChanges, 
-  type Node, 
-  type Edge, 
-  type OnNodesChange, 
-  type OnEdgesChange, 
-  type NodeChange, 
+import { create } from "zustand";
+import {
+  applyNodeChanges,
+  applyEdgeChanges,
+  type Node,
+  type Edge,
+  type OnNodesChange,
+  type OnEdgesChange,
+  type NodeChange,
   type EdgeChange,
   addEdge,
-  type Connection
-} from '@xyflow/react'
-import type { ArchNodeData } from '@archcanvas/shared'
-import { getDefaultProperties } from '../config/nodeSchemas'
+  type Connection,
+} from "@xyflow/react";
+import type { ArchNodeData } from "@archcanvas/shared";
+import { getDefaultProperties } from "../config/nodeSchemas";
 
 interface CanvasState {
   nodes: Node<ArchNodeData>[];
@@ -23,13 +23,28 @@ interface CanvasState {
   addNode: (node: Node<ArchNodeData>) => void;
   addNodeByType: (type: string) => void;
   updateNodeData: (nodeId: string, data: Partial<ArchNodeData>) => void;
-  setAnalysisResults: (edges: { edgeId: string; recommendedProtocol: string; engineeringExplanation: string }[], suggestions?: { title: string; description: string; suggestedNodeType?: string; priority: 'low' | 'medium' | 'high' }[]) => void;
-  suggestions: { title: string; description: string; suggestedNodeType?: string; priority: 'low' | 'medium' | 'high' }[];
+  setAnalysisResults: (
+    edges: { edgeId: string; recommendedProtocol: string; engineeringExplanation: string }[],
+    suggestions?: {
+      title: string;
+      description: string;
+      suggestedNodeType?: string;
+      priority: "low" | "medium" | "high";
+    }[],
+  ) => void;
+  suggestions: {
+    title: string;
+    description: string;
+    suggestedNodeType?: string;
+    priority: "low" | "medium" | "high";
+  }[];
   leftSidebarOpen: boolean;
   rightSidebarOpen: boolean;
   toggleLeftSidebar: () => void;
   toggleRightSidebar: () => void;
   setRightSidebarOpen: (open: boolean) => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
 }
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
@@ -38,10 +53,12 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   suggestions: [],
   leftSidebarOpen: true,
   rightSidebarOpen: false,
+  selectedModel: "gemini-flash-latest",
 
   toggleLeftSidebar: () => set({ leftSidebarOpen: !get().leftSidebarOpen }),
   toggleRightSidebar: () => set({ rightSidebarOpen: !get().rightSidebarOpen }),
   setRightSidebarOpen: (open: boolean) => set({ rightSidebarOpen: open }),
+  setSelectedModel: (model: string) => set({ selectedModel: model }),
 
   onNodesChange: (changes: NodeChange<Node<ArchNodeData>>[]) => {
     set({
@@ -70,12 +87,12 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   addNodeByType: (type: string) => {
     const newNode: Node<ArchNodeData> = {
       id: `${type}-${Date.now()}`,
-      type: 'intentNode',
+      type: "intentNode",
       position: { x: 100 + Math.random() * 200, y: 100 + Math.random() * 200 },
-      data: { 
-        label: type, 
-        category: 'Suggested', 
-        intentProperties: getDefaultProperties(type)
+      data: {
+        label: type,
+        category: "Suggested",
+        intentProperties: getDefaultProperties(type),
       },
     };
     set({

@@ -1,28 +1,28 @@
-import type { 
-  AnalyzeRequest, 
-  AnalyzeResponse, 
-  PipelineSummary, 
-  PipelineDetail 
-} from '@archcanvas/shared';
-import { ApiError, BadRequestError, NotFoundError, ServerError } from './errors';
+import type {
+  AnalyzeRequest,
+  AnalyzeResponse,
+  PipelineSummary,
+  PipelineDetail,
+} from "@archcanvas/shared";
+import { ApiError, BadRequestError, NotFoundError, ServerError } from "./errors";
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    if (res.status === 400) throw new BadRequestError(data.error || 'Bad Request', data);
-    if (res.status === 404) throw new NotFoundError(data.error || 'Not Found');
-    throw new ServerError(data.error || 'Internal Server Error', res.status);
+    if (res.status === 400) throw new BadRequestError(data.error || "Bad Request", data);
+    if (res.status === 404) throw new NotFoundError(data.error || "Not Found");
+    throw new ServerError(data.error || "Internal Server Error", res.status);
   }
   return res.json();
 }
 
-const BASE_URL = import.meta.env.VITE_API_URL || '';
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 
 export const apiClient = {
   async analyzeArchitecture(request: AnalyzeRequest): Promise<AnalyzeResponse> {
     const res = await fetch(`${BASE_URL}/api/analyze-architecture`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
     });
     return handleResponse<AnalyzeResponse>(res);
@@ -40,17 +40,20 @@ export const apiClient = {
 
   async createPipeline(name: string, canvasState: any): Promise<PipelineDetail> {
     const res = await fetch(`${BASE_URL}/api/pipelines`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, canvasState }),
     });
     return handleResponse<PipelineDetail>(res);
   },
 
-  async updatePipeline(id: string, data: Partial<{ name: string; canvasState: any }>): Promise<PipelineDetail> {
+  async updatePipeline(
+    id: string,
+    data: Partial<{ name: string; canvasState: any }>,
+  ): Promise<PipelineDetail> {
     const res = await fetch(`${BASE_URL}/api/pipelines/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     return handleResponse<PipelineDetail>(res);
@@ -58,11 +61,16 @@ export const apiClient = {
 
   async deletePipeline(id: string): Promise<void> {
     const res = await fetch(`${BASE_URL}/api/pipelines/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      throw new ApiError(data.error || 'Delete failed', res.status);
+      throw new ApiError(data.error || "Delete failed", res.status);
     }
+  },
+
+  async getGeminiModels(): Promise<{ status: string; models: any[] }> {
+    const res = await fetch(`${BASE_URL}/api/diagnostic/gemini`);
+    return handleResponse<{ status: string; models: any[] }>(res);
   },
 };
