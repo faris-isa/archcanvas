@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useOnSelectionChange } from "@xyflow/react";
 import { ChatSidebar } from "./ChatSidebar";
 import { SuggestionSidebar } from "./SuggestionSidebar";
@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import { useCanvasStore } from "../../store/useCanvasStore";
 import { Shortcut } from "../common/Shortcut";
-
-type SidebarTab = "chat" | "insights" | "properties";
 
 export const UnifiedSidebar: React.FC = () => {
   const rightSidebarOpen = useCanvasStore((state) => state.rightSidebarOpen);

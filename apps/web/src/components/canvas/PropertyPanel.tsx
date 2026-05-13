@@ -5,9 +5,15 @@ import { useCanvasStore } from "../../store/useCanvasStore";
 import type { ArchNodeData, IntentProperty } from "@archcanvas/shared";
 import { ChevronLeft, ChevronRight, Settings2, X } from "lucide-react";
 
-export const PropertyPanel: React.FC = () => {
+interface PropertyPanelProps {
+  forceOpen?: boolean;
+}
+
+export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
   const [selectedNode, setSelectedNode] = React.useState<Node<ArchNodeData> | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const effectiveOpen = forceOpen || isOpen;
   const updateNodeData = useCanvasStore((s) => s.updateNodeData);
 
   useOnSelectionChange({
@@ -32,7 +38,7 @@ export const PropertyPanel: React.FC = () => {
   return (
     <div
       className={`relative h-full bg-[var(--color-bg-secondary)] border-l border-[var(--color-border)] transition-all duration-500 ease-in-out flex flex-shrink-0 ${
-        isOpen ? "w-80" : "w-0"
+        effectiveOpen ? "w-80" : "w-0"
       }`}
     >
       {/* Toggle Handle (The "Folder" Tab) */}
@@ -60,7 +66,7 @@ export const PropertyPanel: React.FC = () => {
       {/* Main Content */}
       <div
         className={`flex flex-col h-full w-80 overflow-hidden transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          effectiveOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
         {!selectedNode ? (
