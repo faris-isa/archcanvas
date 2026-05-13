@@ -9,7 +9,7 @@ import ProtocolEdge from "./ProtocolEdge";
 import { useTheme } from "../../hooks/useTheme";
 import { getDefaultProperties } from "../../config/nodeSchemas";
 
-import ArchitecturalGroup from "../nodes/MedallionGroup";
+import ArchitecturalGroup from "../nodes/ArchitecturalGroup";
 
 const nodeTypes = {
   intentNode: IntentNode,
