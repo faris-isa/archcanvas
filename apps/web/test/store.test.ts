@@ -17,7 +17,7 @@ describe("useCanvasStore", () => {
         category: "Test",
         intentProperties: {
           "throughput-rate": "medium",
-          "environment": "cloud",
+          environment: "cloud",
           "latency-tolerance": "medium",
           "network-reliability": "stable",
         },
@@ -37,7 +37,7 @@ describe("useCanvasStore", () => {
         category: "Test",
         intentProperties: {
           "throughput-rate": "medium",
-          "environment": "cloud",
+          environment: "cloud",
           "latency-tolerance": "medium",
           "network-reliability": "stable",
         },
@@ -45,9 +45,9 @@ describe("useCanvasStore", () => {
     };
     useCanvasStore.getState().addNode(node);
     const originalNode = useCanvasStore.getState().nodes[0];
-    
+
     useCanvasStore.getState().updateNodeData("1", { label: "Updated Label" });
-    
+
     const updatedNode = useCanvasStore.getState().nodes[0];
     expect(updatedNode.data.label).toBe("Updated Label");
     expect(updatedNode).not.toBe(originalNode); // Reference check

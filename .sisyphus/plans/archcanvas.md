@@ -5,6 +5,7 @@
 > **Quick Summary**: Build ArchCanvas — a React Flow canvas tool where users drag agnostic pipeline nodes, set intent properties, and get AI-recommended transport protocols via Gemini. Vite+ monorepo (apps/web uses `vp` toolchain, apps/api uses `vp` toolchain), Firestore persistence, TDD throughout.
 >
 > **Deliverables**:
+>
 > - Monorepo scaffold (Vite+ workspace with apps/web and apps/api)
 > - React Flow drag-and-drop canvas with 3 node categories (7-8 node types)
 > - Intent property editing per node (4 properties: throughput-rate, environment, latency-tolerance, network-reliability)
@@ -22,10 +23,13 @@
 ## Context
 
 ### Original Request
+
 Build ArchCanvas — an intent-driven data pipeline architecting tool. Users drag agnostic components (Factory Floor Sensor, High-Speed Sink, Stream Processor) onto a canvas, define intent properties (throughput-rate, environment, latency-tolerance, network-reliability), and AI (Gemini) automatically recommends the optimal transport protocol (MQTT, OPC UA, Kafka, gRPC) for each connection with an engineering explanation.
 
 ### Interview Summary
+
 **Key Discussions**:
+
 - **MVP Scope**: Core pipeline first — canvas + AI recommendation on all connections. Not full production.
 - **Persistence**: Firestore via Firebase Admin — Excalidraw-like save/load. Sidebar list + save button UX.
 - **AI Output**: Protocol name + engineering explanation per edge. Batch analysis (all edges at once).
@@ -34,6 +38,7 @@ Build ArchCanvas — an intent-driven data pipeline architecting tool. Users dra
 - **UI**: Dark tech-industrial aesthetic designed by agent from description.
 
 **Research Findings**:
+
 - **React Flow v12**: Use `@xyflow/react`. Key patterns: Zustand store with `applyNodeChanges`/`applyEdgeChanges`. Drag-and-drop uses `onDragStart` + `onDrop` + `screenToFlowPosition`. Edge data mutation does NOT trigger re-render — must create new objects.
 - **Hono**: Node.js server via `@hono/node-server`. Middleware stack (cors, logger, bodyLimit). Error handling via `HTTPException`.
 - **Gemini**: `@google/genai` SDK with API key auth. Structured output via `responseMimeType: 'application/json'` + `responseSchema`. Only certain models support structured output — use `gemini-2.0-flash` or `gemini-1.5-pro`.
@@ -41,7 +46,9 @@ Build ArchCanvas — an intent-driven data pipeline architecting tool. Users dra
 - **VitePlus**: React TypeScript scaffolding with Vite proxy support.
 
 ### Metis Review
+
 **Identified Gaps** (addressed):
+
 - **Batch vs per-edge analysis**: Decided — batch analysis (one API call for all edges). Simpler UX and fewer API calls.
 - **Stale recommendation handling**: When intent properties change after analysis, mark recommendations as "stale" with visual indicator.
 - **Initial canvas state**: Empty canvas, no template.
@@ -56,9 +63,11 @@ Build ArchCanvas — an intent-driven data pipeline architecting tool. Users dra
 ## Work Objectives
 
 ### Core Objective
+
 Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag generic pipeline nodes, configure intent properties, connect them, and get AI-recommended transport protocols — all persisted to Firestore.
 
 ### Concrete Deliverables
+
 - `apps/web/` — Vite+ React frontend with React Flow canvas, sidebar, node library, property panel
 - `apps/api/` — Hono backend with Gemini integration, mock service, and Firestore persistence
 - `packages/shared/` — Shared types between frontend and backend
@@ -66,6 +75,7 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 - Working end-to-end flow: drag → connect → set properties → analyze → see recommendations → save
 
 ### Definition of Done
+
 - [x] User can drag nodes from sidebar onto canvas
 - [x] User can set 4 intent properties per node
 - [x] User can connect nodes with edges
@@ -76,6 +86,7 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 - [x] Dark tech-industrial UI theme applied throughout
 
 ### Must Have
+
 - React Flow drag-and-drop from sidebar to canvas
 - Custom IntentNode with 4 editable properties
 - Edge labels showing recommended protocol after analysis
@@ -87,6 +98,7 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 - TDD — every feature has tests
 
 ### Must NOT Have (Guardrails)
+
 - NO auto-re-analysis on property change (stale indicator only — re-analysis is explicit button click)
 - NO shared types package in `/packages/shared/` unless types are genuinely duplicated across apps (use inline types in each app first)
 - NO user authentication or authorization
@@ -104,6 +116,7 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 > **ZERO HUMAN INTERVENTION** — ALL verification is agent-executed. No exceptions.
 
 ### Test Decision
+
 - **Infrastructure exists**: NO (greenfield — scaffold from scratch)
 - **Automated tests**: TDD (red-green-refactor)
 - **Framework**: **Vitest via `vp test`** for both frontend and backend (Vite+ unified toolchain)
@@ -112,6 +125,7 @@ Build a working MVP of ArchCanvas: a canvas-based tool where data engineers drag
 - **TDD flow**: Each task follows RED (write failing test) → GREEN (minimal impl) → REFACTOR
 
 ### QA Policy
+
 Every task MUST include agent-executed QA scenarios.
 Evidence saved to `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.
 
@@ -162,35 +176,35 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ### Dependency Matrix
 
-| Task | Depends On | Blocks |
-|------|-----------|--------|
-| 1 | — | 2, 3, 4, 5 |
-| 2 | 1 | 8, 9, 10 |
-| 3 | 1 | 8 |
-| 4 | 1, 5 | 6, 7, 11 |
-| 5 | 1 | 4, 9, 10, 13 |
-| 6 | 1, 4 | 11, 15 |
-| 7 | 1, 4 | 11, 15 |
-| 8 | 2, 3 | 12, 15 |
-| 9 | 2, 5 | 10 |
-| 10 | 2, 5, 9 | 11, 13, 15 |
-| 11 | 6, 7, 10 | 15 |
-| 12 | 8 | 15 |
-| 13 | 5, 10 | 15 |
-| 14 | — | 15 |
-| 15 | 6, 7, 8, 10, 11, 12, 13 | 16 |
-| 16 | 15 | FINAL |
+| Task | Depends On              | Blocks       |
+| ---- | ----------------------- | ------------ |
+| 1    | —                       | 2, 3, 4, 5   |
+| 2    | 1                       | 8, 9, 10     |
+| 3    | 1                       | 8            |
+| 4    | 1, 5                    | 6, 7, 11     |
+| 5    | 1                       | 4, 9, 10, 13 |
+| 6    | 1, 4                    | 11, 15       |
+| 7    | 1, 4                    | 11, 15       |
+| 8    | 2, 3                    | 12, 15       |
+| 9    | 2, 5                    | 10           |
+| 10   | 2, 5, 9                 | 11, 13, 15   |
+| 11   | 6, 7, 10                | 15           |
+| 12   | 8                       | 15           |
+| 13   | 5, 10                   | 15           |
+| 14   | —                       | 15           |
+| 15   | 6, 7, 8, 10, 11, 12, 13 | 16           |
+| 16   | 15                      | FINAL        |
 
 ### Agent Dispatch Summary
 
-| Wave | Tasks | Profiles |
-|------|-------|----------|
-| 1a | 4 | T1 → `quick`, T2 → `quick`, T3 → `quick`, T5 → `quick` |
-| 1b | 1 | T4 → `quick` |
-| 2 | 5 | T6 → `visual-engineering`, T7 → `visual-engineering`, T8 → `unspecified-high`, T9 → `deep`, T10 → `unspecified-high` |
-| 3 | 4 | T11 → `visual-engineering`, T12 → `visual-engineering`, T13 → `unspecified-high`, T14 → `visual-engineering` |
-| 4 | 2 | T15 → `unspecified-high`, T16 → `unspecified-high` |
-| FINAL | 4 | F1 → `oracle`, F2 → `unspecified-high`, F3 → `unspecified-high`, F4 → `deep` |
+| Wave  | Tasks | Profiles                                                                                                             |
+| ----- | ----- | -------------------------------------------------------------------------------------------------------------------- |
+| 1a    | 4     | T1 → `quick`, T2 → `quick`, T3 → `quick`, T5 → `quick`                                                               |
+| 1b    | 1     | T4 → `quick`                                                                                                         |
+| 2     | 5     | T6 → `visual-engineering`, T7 → `visual-engineering`, T8 → `unspecified-high`, T9 → `deep`, T10 → `unspecified-high` |
+| 3     | 4     | T11 → `visual-engineering`, T12 → `visual-engineering`, T13 → `unspecified-high`, T14 → `visual-engineering`         |
+| 4     | 2     | T15 → `unspecified-high`, T16 → `unspecified-high`                                                                   |
+| FINAL | 4     | F1 → `oracle`, F2 → `unspecified-high`, F3 → `unspecified-high`, F4 → `deep`                                         |
 
 ---
 
@@ -238,6 +252,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Both apps have `vp test run` configured
 
   **QA Scenarios**:
+
   ```
   Scenario: Monorepo installs and starts
     Tool: Bash
@@ -317,6 +332,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Error handler returns structured JSON for unhandled routes
 
   **QA Scenarios**:
+
   ```
   Scenario: Health endpoint responds correctly
     Tool: Bash (curl)
@@ -380,6 +396,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Firestore collections auto-created on first write
 
   **QA Scenarios**:
+
   ```
   Scenario: Pipeline CRUD operations work
     Tool: Bash (vp test run)
@@ -437,6 +454,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] `onNodesChange`/`onEdgesChange` use React Flow's `applyNodeChanges`/`applyEdgeChanges`
 
   **QA Scenarios**:
+
   ```
   Scenario: Store actions modify state correctly
     Tool: Bash (vp test run)
@@ -489,6 +507,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] TypeScript compilation succeeds in both apps
 
   **QA Scenarios**:
+
   ```
   Scenario: Shared types importable from both apps
     Tool: Bash
@@ -544,6 +563,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Store `onNodesChange`/`onEdgesChange` wired to React Flow handlers
 
   **QA Scenarios**:
+
   ```
   Scenario: Drag node from sidebar and drop on canvas
     Tool: Playwright
@@ -599,6 +619,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Handle components present for edge connections
 
   **QA Scenarios**:
+
   ```
   Scenario: Edit intent properties on a node
     Tool: Playwright
@@ -655,6 +676,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] `vp test run` (from apps/api) passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Full pipeline CRUD cycle
     Tool: Bash (curl)
@@ -716,6 +738,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] `vp test run` (from apps/api) passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Mock service returns correct protocols
     Tool: Bash (vp test run)
@@ -769,6 +792,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Mock mode works without API key
 
   **QA Scenarios**:
+
   ```
   Scenario: Analyze with mock service
     Tool: Bash (curl)
@@ -822,6 +846,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Error shows user-friendly message
 
   **QA Scenarios**:
+
   ```
   Scenario: Analyze and see protocol labels
     Tool: Playwright
@@ -874,6 +899,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Canvas serialization includes viewport/zoom
 
   **QA Scenarios**:
+
   ```
   Scenario: Save and load pipeline
     Tool: Playwright
@@ -927,6 +953,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] `vp test run` (from apps/web) passes
 
   **QA Scenarios**:
+
   ```
   Scenario: API client functions work
     Tool: Bash (vp test run)
@@ -982,6 +1009,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Protocol names in monospace, theme via CSS variables
 
   **QA Scenarios**:
+
   ```
   Scenario: Dark theme applied consistently
     Tool: Playwright
@@ -1031,6 +1059,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] API integration test covers: create → analyze → update → verify
 
   **QA Scenarios**:
+
   ```
   Scenario: Full end-to-end pipeline
     Tool: Playwright
@@ -1092,6 +1121,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - [ ] Network errors show friendly message
 
   **QA Scenarios**:
+
   ```
   Scenario: Stale indicator after property change
     Tool: Playwright
@@ -1127,49 +1157,50 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 
 - [ ] F1. **Plan Compliance Audit** — `oracle`
-  Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
-  Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
+      Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
+      Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
 - [ ] F2. **Code Quality Review** — `unspecified-high`
-  Run `tsc --noEmit` + linter + `vp test run`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
-  Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
+      Run `tsc --noEmit` + linter + `vp test run`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
+      Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
 - [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill)
-  Start from clean state. Execute EVERY QA scenario from EVERY task — follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Test edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
-  Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
+      Start from clean state. Execute EVERY QA scenario from EVERY task — follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Test edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
+      Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
 - [ ] F4. **Scope Fidelity Check** — `deep`
-  For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
-  Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
+      For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
+      Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
 ---
 
 ## Commit Strategy
 
-| Commit | Message | Files | Pre-commit |
-|--------|---------|-------|------------|
-| 1 | `feat(scaffold): initialize Vite+ monorepo with vp test and vp dev` | Root config, both app dirs | `vp install && vp test run` |
-| 2 | `feat(api): add Hono skeleton with health endpoint` | `apps/api/src/**` | `cd apps/api && vp test run` |
-| 3 | `feat(api): add Firebase Admin SDK + Firestore pipeline service` | `apps/api/src/firebase/**`, `apps/api/firebase.json` | `cd apps/api && vp test run` |
-| 4 | `feat(web): add Zustand canvas store + shared types` | `apps/web/src/store/**`, `packages/shared/**` | `cd apps/web && vp test run` |
-| 5 | `feat(shared): add shared types package for API contracts` | `packages/shared/**` | `vp install && vp test run` |
-| 6 | `feat(web): add React Flow canvas with drag-and-drop sidebar` | `apps/web/src/components/**` | `cd apps/web && vp test run` |
-| 7 | `feat(web): add IntentNode custom component with property editing` | `apps/web/src/components/nodes/**` | `cd apps/web && vp test run` |
-| 8 | `feat(api): add pipeline CRUD endpoints` | `apps/api/src/routes/**` | `cd apps/api && vp test run` |
-| 9 | `feat(api): add Gemini service + mock service` | `apps/api/src/services/**` | `cd apps/api && vp test run` |
-| 10 | `feat(api): add /api/analyze-architecture endpoint` | `apps/api/src/routes/analyze.ts` | `cd apps/api && vp test run` |
-| 11 | `feat(web): add edge protocol labels + analysis trigger UI` | `apps/web/src/components/canvas/**` | `cd apps/web && vp test run` |
-| 12 | `feat(web): add save/load pipeline UX` | `apps/web/src/components/sidebar/**` | `cd apps/web && vp test run` |
-| 13 | `feat(web): add frontend API client + integration` | `apps/web/src/api/**` | `cd apps/web && vp test run` |
-| 14 | `feat(web): apply dark tech-industrial theme` | `apps/web/src/styles/**`, `tailwind.config.*` | `cd apps/web && vp test run` |
-| 15 | `feat(e2e): end-to-end flow integration` | E2E test files | `vp test run` |
-| 16 | `fix(web): stale recommendation indicators + edge cases` | `apps/web/src/**` | `vp test run` |
+| Commit | Message                                                             | Files                                                | Pre-commit                   |
+| ------ | ------------------------------------------------------------------- | ---------------------------------------------------- | ---------------------------- |
+| 1      | `feat(scaffold): initialize Vite+ monorepo with vp test and vp dev` | Root config, both app dirs                           | `vp install && vp test run`  |
+| 2      | `feat(api): add Hono skeleton with health endpoint`                 | `apps/api/src/**`                                    | `cd apps/api && vp test run` |
+| 3      | `feat(api): add Firebase Admin SDK + Firestore pipeline service`    | `apps/api/src/firebase/**`, `apps/api/firebase.json` | `cd apps/api && vp test run` |
+| 4      | `feat(web): add Zustand canvas store + shared types`                | `apps/web/src/store/**`, `packages/shared/**`        | `cd apps/web && vp test run` |
+| 5      | `feat(shared): add shared types package for API contracts`          | `packages/shared/**`                                 | `vp install && vp test run`  |
+| 6      | `feat(web): add React Flow canvas with drag-and-drop sidebar`       | `apps/web/src/components/**`                         | `cd apps/web && vp test run` |
+| 7      | `feat(web): add IntentNode custom component with property editing`  | `apps/web/src/components/nodes/**`                   | `cd apps/web && vp test run` |
+| 8      | `feat(api): add pipeline CRUD endpoints`                            | `apps/api/src/routes/**`                             | `cd apps/api && vp test run` |
+| 9      | `feat(api): add Gemini service + mock service`                      | `apps/api/src/services/**`                           | `cd apps/api && vp test run` |
+| 10     | `feat(api): add /api/analyze-architecture endpoint`                 | `apps/api/src/routes/analyze.ts`                     | `cd apps/api && vp test run` |
+| 11     | `feat(web): add edge protocol labels + analysis trigger UI`         | `apps/web/src/components/canvas/**`                  | `cd apps/web && vp test run` |
+| 12     | `feat(web): add save/load pipeline UX`                              | `apps/web/src/components/sidebar/**`                 | `cd apps/web && vp test run` |
+| 13     | `feat(web): add frontend API client + integration`                  | `apps/web/src/api/**`                                | `cd apps/web && vp test run` |
+| 14     | `feat(web): apply dark tech-industrial theme`                       | `apps/web/src/styles/**`, `tailwind.config.*`        | `cd apps/web && vp test run` |
+| 15     | `feat(e2e): end-to-end flow integration`                            | E2E test files                                       | `vp test run`                |
+| 16     | `fix(web): stale recommendation indicators + edge cases`            | `apps/web/src/**`                                    | `vp test run`                |
 
 ---
 
 ## Success Criteria
 
 ### Verification Commands
+
 ```bash
 vp run -r test                   # Expected: all tests pass across both apps
 cd apps/web && vp test run       # Expected: all frontend tests pass
@@ -1179,6 +1210,7 @@ cd apps/api && vp run dev        # Expected: server starts on port 3000
 ```
 
 ### Final Checklist
+
 - [x] All "Must Have" present
 - [x] All "Must NOT Have" absent
 - [x] All tests pass

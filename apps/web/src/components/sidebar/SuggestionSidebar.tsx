@@ -1,10 +1,9 @@
-import React from 'react';
-import { Lightbulb, AlertTriangle, Plus, Info } from 'lucide-react';
-import { useCanvasStore } from '../../store/useCanvasStore';
+import React from "react";
+import { Lightbulb, AlertTriangle, Plus, Info } from "lucide-react";
+import { useCanvasStore } from "../../store/useCanvasStore";
 
 export const SuggestionSidebar: React.FC<{ forceOpen?: boolean }> = () => {
   const { suggestions, addNodeByType } = useCanvasStore();
-
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-tech-gray">
@@ -28,30 +27,34 @@ export const SuggestionSidebar: React.FC<{ forceOpen?: boolean }> = () => {
       ) : (
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {suggestions.map((suggestion, index) => (
-            <div 
+            <div
               key={index}
               className={`p-3 rounded-lg border bg-tech-gray/40 relative group transition-all duration-300 hover:border-industrial-gold/50 ${
-                suggestion.priority === 'high' ? 'border-amber-500/30' : 'border-industrial-gray'
+                suggestion.priority === "high" ? "border-amber-500/30" : "border-industrial-gray"
               }`}
             >
               <div className="flex items-start justify-between mb-1">
-                <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${
-                  suggestion.priority === 'high' ? 'bg-amber-900/50 text-amber-400' : 'bg-industrial-gray/50 text-gray-400'
-                }`}>
+                <span
+                  className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${
+                    suggestion.priority === "high"
+                      ? "bg-amber-900/50 text-amber-400"
+                      : "bg-industrial-gray/50 text-gray-400"
+                  }`}
+                >
                   {suggestion.priority} priority
                 </span>
-                {suggestion.priority === 'high' && <AlertTriangle size={12} className="text-amber-500 animate-pulse" />}
+                {suggestion.priority === "high" && (
+                  <AlertTriangle size={12} className="text-amber-500 animate-pulse" />
+                )}
               </div>
 
               <h3 className="text-xs font-bold text-white mb-1 group-hover:text-industrial-gold transition-colors">
                 {suggestion.title}
               </h3>
-              <p className="text-[10px] text-gray-400 leading-relaxed">
-                {suggestion.description}
-              </p>
+              <p className="text-[10px] text-gray-400 leading-relaxed">{suggestion.description}</p>
 
               {suggestion.suggestedNodeType && (
-                <button 
+                <button
                   onClick={() => addNodeByType(suggestion.suggestedNodeType!)}
                   className="mt-3 w-full flex items-center justify-center gap-2 py-1.5 rounded bg-industrial-gray/30 border border-industrial-gray hover:bg-industrial-gold/10 hover:border-industrial-gold/50 transition-all text-[10px] font-bold text-gray-300 hover:text-industrial-gold"
                 >

@@ -1,6 +1,6 @@
-import { AppLayout } from './components/layout/AppLayout';
-import { ArchFlow } from './components/canvas/ArchFlow';
-import { ReactFlowProvider } from '@xyflow/react';
+import { AppLayout } from "./components/layout/AppLayout";
+import { ArchFlow } from "./components/canvas/ArchFlow";
+import { ReactFlowProvider } from "@xyflow/react";
 
 function App() {
   return (

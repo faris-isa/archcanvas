@@ -6,11 +6,11 @@
   --color-tech-accent: #3b82f6;
   --color-industrial-gold: #d4af37;
   --color-industrial-gray: #4a4a4a;
-  
+
   /* Light mode tokens */
   --color-tech-light: #f8fafc;
   --color-tech-light-gray: #f1f5f9;
-  
+
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
@@ -94,4 +94,3 @@ body {
 :root.light .brand-logo:hover {
   opacity: 1;
 }
-
