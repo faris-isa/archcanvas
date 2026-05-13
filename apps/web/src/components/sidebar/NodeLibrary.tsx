@@ -4,6 +4,7 @@ import { PipelineList } from "./PipelineList";
 import { NODE_TYPES } from "../../config/nodeTypes";
 import { getNodeIcon } from "../../utils/nodeIcons";
 import { useCanvasStore } from "../../store/useCanvasStore";
+import { Shortcut } from "../common/Shortcut";
 
 export const NodeLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -63,11 +64,16 @@ export const NodeLibrary: React.FC = () => {
         }`}
       >
         <div className="p-6 border-b border-[var(--color-border)] space-y-4 flex-shrink-0">
-          <div>
-            <h2 className="text-2xl font-bold text-industrial-gold tracking-tight">Node Library</h2>
-            <p className="text-[10px] text-[var(--color-text-secondary)] uppercase tracking-[0.2em] mt-1 font-semibold">
-              Architectural Components
-            </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-industrial-gold tracking-tight">
+                Node Library
+              </h2>
+              <p className="text-[10px] text-[var(--color-text-secondary)] uppercase tracking-[0.2em] mt-1 font-semibold">
+                Architectural Components
+              </p>
+            </div>
+            <Shortcut keys={["Ctrl", "B"]} className="opacity-30 mt-2" />
           </div>
 
           <div className="relative group">

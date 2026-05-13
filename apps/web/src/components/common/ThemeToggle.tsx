@@ -1,5 +1,6 @@
 import React from "react";
 import { useTheme } from "../../hooks/useTheme";
+import { Shortcut } from "./Shortcut";
 
 export const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -7,8 +8,8 @@ export const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg border border-industrial-gray hover:bg-gray-800 transition-colors flex items-center justify-center group"
-      title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+      className="group relative p-2 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bg-secondary)] transition-all flex items-center justify-center"
+      title={`Switch to ${theme === "dark" ? "light" : "dark"} mode (Ctrl + Shift + L)`}
     >
       {theme === "dark" ? (
         <svg
@@ -49,6 +50,10 @@ export const ThemeToggle: React.FC = () => {
           <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
         </svg>
       )}
+      <Shortcut
+        keys={["Ctrl", "Shift", "L"]}
+        className="absolute -bottom-10 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-bg-secondary)] p-1 rounded border border-[var(--color-border)] pointer-events-none whitespace-nowrap z-50 shadow-xl"
+      />
     </button>
   );
 };

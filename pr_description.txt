@@ -1,0 +1,11 @@
+Elevated the ArchCanvas UI with a premium industrial design system and professional keyboard-driven workflow.
+
+### Key Changes:
+- Custom Select Component: Replaced native dropdowns with high-fidelity, theme-aware components featuring smooth animations.
+- Theme-Aware Sidebars: Fixed light theme inconsistencies in the Node Library and Intelligence Center (Chat, Insights, Props).
+- Professional Shortcut System: 
+  - Implemented Alt + 1/2/3 for rapid sidebar tab switching.
+  - Added Ctrl + S for global saving.
+  - Standardized Ctrl + B and Ctrl + Shift + B for sidebar toggling.
+  - Added discoverable shortcut hints across the UI.
+- Visual Refinement: Polished the 'Analyze Architecture' and 'Save' buttons for better light mode integration.
