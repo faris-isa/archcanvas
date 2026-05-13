@@ -44,7 +44,6 @@ const BRAND_LOGOS: Record<string, string> = {
   slack: "slack",
   grafana: "grafana",
   telegraf: "influxdb",
-  influx: "influxdb",
   fluentd: "fluentd",
   vector: "vector",
   rabbitmq: "rabbitmq",
