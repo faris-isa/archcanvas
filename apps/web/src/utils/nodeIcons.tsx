@@ -89,12 +89,31 @@ const getBrandIcon = (label: string, size: number = 18) => {
   // 1. Try Special Mappings (Direct URLs)
   const specialKey = Object.keys(SPECIAL_LOGOS).find((key) => l.includes(key));
   if (specialKey) {
+    const isMono = l.includes("vector") || l.includes("questdb");
+    if (isMono) {
+      return (
+        <div
+          style={{
+            width: size,
+            height: size,
+            backgroundColor: "var(--color-text-secondary)",
+            WebkitMaskImage: `url(${SPECIAL_LOGOS[specialKey]})`,
+            maskImage: `url(${SPECIAL_LOGOS[specialKey]})`,
+            WebkitMaskSize: "contain",
+            maskSize: "contain",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+          }}
+          className="brand-logo group-hover:scale-110 group-hover:bg-tech-accent transition-all duration-300"
+        />
+      );
+    }
     return (
       <img
         src={SPECIAL_LOGOS[specialKey]}
         alt={label}
         style={{ width: size, height: size }}
-        className="brand-logo group-hover:scale-110 transition-transform duration-300"
+        className="brand-logo group-hover:scale-110 transition-transform duration-300 dark:brightness-110"
       />
     );
   }
@@ -104,15 +123,19 @@ const getBrandIcon = (label: string, size: number = 18) => {
   if (brandKey) {
     const slug = BRAND_LOGOS[brandKey];
     return (
-      <img
-        src={`https://unpkg.com/simple-icons@latest/icons/${slug}.svg`}
-        alt={label}
+      <div
         style={{
           width: size,
           height: size,
-          filter: "brightness(0.8) grayscale(0.2)",
+          backgroundColor: "currentColor",
+          WebkitMaskImage: `url(https://unpkg.com/simple-icons@latest/icons/${slug}.svg)`,
+          maskImage: `url(https://unpkg.com/simple-icons@latest/icons/${slug}.svg)`,
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
         }}
-        className="brand-logo group-hover:scale-110 group-hover:filter-none transition-all duration-300"
+        className="brand-logo opacity-70 group-hover:opacity-100 group-hover:scale-110 group-hover:text-tech-accent transition-all duration-300"
       />
     );
   }
