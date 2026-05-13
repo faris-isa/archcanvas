@@ -84,13 +84,11 @@ export const UnifiedSidebar: React.FC = () => {
             }`}
           >
             <MessageSquare size={16} />
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] font-bold uppercase tracking-widest">Chat</span>
-              <Shortcut
-                keys={["Alt", "1"]}
-                className="opacity-0 group-hover:opacity-20 transition-opacity"
-              />
-            </div>
+            <span className="text-[9px] font-bold uppercase tracking-widest">Chat</span>
+            <Shortcut
+              keys={["Alt", "1"]}
+              className="absolute right-1 top-1 opacity-0 group-hover:opacity-20 transition-opacity scale-75 origin-top-right"
+            />
           </button>
           <button
             onClick={() => setActiveTab("insights")}
@@ -101,13 +99,11 @@ export const UnifiedSidebar: React.FC = () => {
             }`}
           >
             <Lightbulb size={16} />
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] font-bold uppercase tracking-widest">Insights</span>
-              <Shortcut
-                keys={["Alt", "2"]}
-                className="opacity-0 group-hover:opacity-20 transition-opacity"
-              />
-            </div>
+            <span className="text-[9px] font-bold uppercase tracking-widest">Insights</span>
+            <Shortcut
+              keys={["Alt", "2"]}
+              className="absolute right-1 top-1 opacity-0 group-hover:opacity-20 transition-opacity scale-75 origin-top-right"
+            />
           </button>
           <button
             onClick={() => setActiveTab("properties")}
@@ -118,13 +114,11 @@ export const UnifiedSidebar: React.FC = () => {
             }`}
           >
             <Settings2 size={16} />
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] font-bold uppercase tracking-widest">Props</span>
-              <Shortcut
-                keys={["Alt", "3"]}
-                className="opacity-0 group-hover:opacity-20 transition-opacity"
-              />
-            </div>
+            <span className="text-[9px] font-bold uppercase tracking-widest">Props</span>
+            <Shortcut
+              keys={["Alt", "3"]}
+              className="absolute right-1 top-1 opacity-0 group-hover:opacity-20 transition-opacity scale-75 origin-top-right"
+            />
           </button>
         </div>
 
