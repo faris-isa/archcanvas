@@ -2,8 +2,8 @@ import React from 'react';
 import { NodeLibrary } from '../sidebar/NodeLibrary';
 import { AnalyzeButton } from '../canvas/AnalyzeButton';
 import { SaveButton } from '../canvas/SaveButton';
-import { PropertyPanel } from '../canvas/PropertyPanel';
-import { SuggestionSidebar } from '../sidebar/SuggestionSidebar';
+import { UnifiedSidebar } from '../sidebar/UnifiedSidebar';
+import { useCanvasStore } from '../../store/useCanvasStore';
 
 import { ThemeToggle } from '../common/ThemeToggle';
 
@@ -12,6 +12,26 @@ interface AppLayoutProps {
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  const { toggleLeftSidebar, toggleRightSidebar } = useCanvasStore();
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + B = Toggle Left Sidebar (Library)
+      if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleLeftSidebar();
+      }
+      // Ctrl + Shift + B = Toggle Right Sidebar (Intelligence)
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleRightSidebar();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleLeftSidebar, toggleRightSidebar]);
+
   return (
     <div className="flex h-screen w-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] transition-colors duration-300">
       <NodeLibrary />
@@ -26,12 +46,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <SaveButton />
           </div>
         </header>
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden h-full">
           {children}
-          <SuggestionSidebar />
         </div>
+
       </main>
-      <PropertyPanel />
+      <UnifiedSidebar />
     </div>
   );
 };

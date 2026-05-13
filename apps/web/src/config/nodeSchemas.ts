@@ -73,8 +73,8 @@ const EDGE_PROPERTIES: NodeSchema = {
   },
   'connectivity': {
     label: 'Connectivity',
-    options: ['wifi', 'ethernet', 'cellular', 'lorawan', 'ble'],
-    default: 'wifi'
+    options: ['wifi', 'ethernet', 'metro-wan', 'fiber', 'cellular', 'lorawan', 'ble'],
+    default: 'ethernet'
   }
 };
 
@@ -199,8 +199,30 @@ export const NODE_SCHEMAS: Record<string, NodeSchema> = {
   'ClickHouse': ANALYTICS_PROPERTIES,
   'Snowflake': ANALYTICS_PROPERTIES,
   'BigQuery': ANALYTICS_PROPERTIES,
-  'Time-Series DB': TSDB_PROPERTIES,
+  'TimescaleDB': TSDB_PROPERTIES,
+  'QuestDB': TSDB_PROPERTIES,
+  'VictoriaMetrics': TSDB_PROPERTIES,
+  'Apache Druid': TSDB_PROPERTIES,
+  'kdb+': TSDB_PROPERTIES,
   'Data Lake': STORAGE_PROPERTIES,
+
+  // Industrial & Connectivity
+  'Industrial Firewall': CORE_PROPERTIES,
+  'VPN Tunnel': CORE_PROPERTIES,
+  'Device Management': AGENT_PROPERTIES,
+  'Digital Twin': CORE_PROPERTIES,
+  'Metro WAN': STREAMING_PROPERTIES,
+  'SCADA System': APPLICATION_PROPERTIES,
+  'HMI Panel': CORE_PROPERTIES,
+  'Industrial Historian': TSDB_PROPERTIES,
+  'MES Integration': APPLICATION_PROPERTIES,
+  'ERP Connector': APPLICATION_PROPERTIES,
+  'LoRaWAN Gateway': EDGE_PROPERTIES,
+
+  'Power BI': ANALYTICS_PROPERTIES,
+  'Tableau': ANALYTICS_PROPERTIES,
+  'Looker': ANALYTICS_PROPERTIES,
+  'Custom Dashboard': CORE_PROPERTIES,
 
   // Sinks & Alerts
   'Grafana Dashboard': CORE_PROPERTIES,

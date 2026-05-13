@@ -4,7 +4,7 @@ import { useReactFlow } from '@xyflow/react';
 import { apiClient } from '../../api/client';
 
 export const SaveButton: React.FC = () => {
-  const { } = useCanvasStore();
+  useCanvasStore();
   const { toObject } = useReactFlow();
   const [loading, setLoading] = useState(false);
 

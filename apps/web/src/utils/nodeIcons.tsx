@@ -1,43 +1,128 @@
-import React from 'react';
-import { 
-  Cpu, 
-  Database, 
-  Activity, 
-  Zap, 
-  MessageSquare, 
-  Layers, 
-  Server, 
-  HardDrive, 
-  Cloud, 
-  Waves, 
-  Share2, 
-  Terminal, 
-  Webhook, 
-  FileJson, 
-  Table, 
-  BarChart3, 
-  Search, 
-  Bell, 
+import {
+  Cpu,
+  Database,
+  Activity,
+  Zap,
+  MessageSquare,
+  Server,
+  Cloud,
+  Waves,
+  Share2,
+  Terminal,
+  Webhook,
+  Bell,
   Mail,
   Workflow,
-  Compass,
   Gauge,
-  Microscope,
   Box,
   Monitor,
   MonitorSmartphone,
   Smartphone,
   Globe,
-  CloudCog
+  CloudCog,
+  Shield,
+  Lock,
+  History,
+  Copy,
+  Layout,
+  Network
 } from 'lucide-react';
+
+const BRAND_LOGOS: Record<string, string> = {
+  'kafka': 'apachekafka',
+  'prometheus': 'prometheus',
+  'postgres': 'postgresql',
+  'mysql': 'mysql',
+  'cassandra': 'apachecassandra',
+  'redis': 'redis',
+  'mongo': 'mongodb',
+  'clickhouse': 'clickhouse',
+  'snowflake': 'snowflake',
+  'bigquery': 'googlebigquery',
+  'elasticsearch': 'elasticsearch',
+  'slack': 'slack',
+  'grafana': 'grafana',
+  'telegraf': 'influxdb',
+  'influx': 'influxdb',
+  'fluentd': 'fluentd',
+  'rabbitmq': 'rabbitmq',
+  'nats': 'natsdotio',
+  'pulsar': 'apachepulsar',
+  'mqtt': 'mqtt',
+  'lora': 'thethingsnetwork',
+  'ttn': 'thethingsnetwork',
+  'spark': 'apachespark',
+  'flink': 'apacheflink',
+  'lambda': 'awslambda',
+  'pub/sub': 'googlecloud',
+  'google': 'googlecloud',
+  'aws': 'amazonaws',
+  'azure': 'microsoftazure',
+  'python': 'python',
+  'nodejs': 'nodedotjs',
+  'react': 'react',
+  'sap': 'sap',
+  'power bi': 'powerbi',
+  'tableau': 'tableau',
+  'looker': 'looker',
+  'timescale': 'timescale',
+  'questdb': 'questdb',
+  'victoria': 'victoriametrics',
+  'druid': 'apachedruid',
+};
+
+const SPECIAL_LOGOS: Record<string, string> = {
+  'tableau': 'https://www.svgrepo.com/show/342280/tableau.svg',
+  'power bi': 'https://www.svgrepo.com/show/473761/powerbi.svg',
+  'slack': 'https://www.svgrepo.com/show/521850/slack.svg',
+  'vector': 'https://www.svgrepo.com/show/354510/vector-timber.svg',
+  'questdb': 'https://questdb.com/img/questdb-logo-themed.svg',
+};
+
+const getBrandIcon = (label: string, size: number = 18) => {
+  const l = label.toLowerCase();
+
+  // 1. Try Special Mappings (Direct URLs)
+  const specialKey = Object.keys(SPECIAL_LOGOS).find(key => l.includes(key));
+  if (specialKey) {
+    return (
+      <img
+        src={SPECIAL_LOGOS[specialKey]}
+        alt={label}
+        style={{ width: size, height: size }}
+        className="brand-logo group-hover:scale-110 transition-transform duration-300"
+      />
+    );
+  }
+
+  // 2. Try SimpleIcons (Slugs)
+  const brandKey = Object.keys(BRAND_LOGOS).find(key => l.includes(key));
+  if (brandKey) {
+    const slug = BRAND_LOGOS[brandKey];
+    return (
+      <img
+        src={`https://unpkg.com/simple-icons@latest/icons/${slug}.svg`}
+        alt={label}
+        style={{ width: size, height: size }}
+        className="brand-logo group-hover:scale-110 transition-transform duration-300"
+      />
+    );
+  }
+  return null;
+};
 
 export const getNodeIcon = (label: string) => {
   const l = label.toLowerCase();
-  
-  // Edge / Sources
+
+  // Try to get a brand logo first
+  const brandIcon = getBrandIcon(label);
+  if (brandIcon) return brandIcon;
+
+  // Fallback to Lucide for generic components
   if (l.includes('sensor')) return <Activity size={18} />;
   if (l.includes('plc')) return <Cpu size={18} />;
   if (l.includes('gateway')) return <Zap size={18} />;
+  if (l.includes('lora')) return <Waves size={18} />;
   if (l.includes('mqtt')) return <MessageSquare size={18} />;
   if (l.includes('opc')) return <Server size={18} />;
   if (l.includes('webhook')) return <Webhook size={18} />;
@@ -50,45 +135,34 @@ export const getNodeIcon = (label: string) => {
   if (l.includes('api')) return <Globe size={18} />;
 
   // Agents & Collectors
-  if (l.includes('telegraf')) return <Compass size={18} />;
-  if (l.includes('fluentd')) return <Box size={18} />;
-  if (l.includes('vector')) return <Zap size={18} />;
   if (l.includes('agent')) return <CloudCog size={18} />;
 
-  // Transport / Streaming
-  if (l.includes('kafka')) return <Waves size={18} />;
-  if (l.includes('pulsar')) return <Waves size={18} />;
-  if (l.includes('broker')) return <Share2 size={18} />;
-  if (l.includes('rabbitmq')) return <Share2 size={18} />;
-  if (l.includes('nats')) return <Share2 size={18} />;
-  if (l.includes('pub/sub')) return <Cloud size={18} />;
+  // Processing & Streams
   if (l.includes('stream')) return <Waves size={18} />;
-
-  // Processing
-  if (l.includes('spark')) return <Layers size={18} />;
-  if (l.includes('flink')) return <Layers size={18} />;
-  if (l.includes('lambda')) return <Terminal size={18} />;
-  if (l.includes('function')) return <Terminal size={18} />;
   if (l.includes('script')) return <Terminal size={18} />;
+  if (l.includes('function')) return <Terminal size={18} />;
 
   // Storage
-  if (l.includes('influx')) return <Gauge size={18} />;
-  if (l.includes('prometheus')) return <Gauge size={18} />;
-  if (l.includes('postgres')) return <Database size={18} />;
-  if (l.includes('cassandra')) return <HardDrive size={18} />;
-  if (l.includes('redis')) return <Zap size={18} />;
-  if (l.includes('mongo')) return <FileJson size={18} />;
-  if (l.includes('clickhouse')) return <Table size={18} />;
-  if (l.includes('snowflake')) return <Microscope size={18} />;
-  if (l.includes('bigquery')) return <Microscope size={18} />;
   if (l.includes('data lake')) return <Cloud size={18} />;
   if (l.includes('db')) return <Database size={18} />;
+  if (l.includes('kdb')) return <Gauge size={18} />;
+
+  // Industrial Systems (SCADA/MES)
+  if (l.includes('scada')) return <Layout size={18} />;
+  if (l.includes('hmi')) return <Monitor size={18} />;
+  if (l.includes('historian')) return <History size={18} />;
+  if (l.includes('mes')) return <Workflow size={18} />;
+  if (l.includes('erp')) return <Box size={18} />;
+
+  // Connectivity & Security
+  if (l.includes('firewall')) return <Shield size={18} />;
+  if (l.includes('vpn')) return <Lock size={18} />;
+  if (l.includes('metro')) return <Network size={18} />;
+  if (l.includes('twin')) return <Copy size={18} />;
+  if (l.includes('management')) return <CloudCog size={18} />;
 
   // Sinks / Visuals
-  if (l.includes('grafana')) return <Monitor size={18} />;
   if (l.includes('dashboard')) return <Monitor size={18} />;
-  if (l.includes('elastic')) return <Search size={18} />;
-  if (l.includes('slack')) return <MessageSquare size={18} />;
   if (l.includes('mail')) return <Mail size={18} />;
   if (l.includes('alert')) return <Bell size={18} />;
 

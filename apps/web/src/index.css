@@ -74,3 +74,23 @@ body {
 .react-flow__edge-path {
   @apply !stroke-gray-500/30;
 }
+
+/* Brand Logo Support */
+.brand-logo {
+  filter: brightness(0) invert(1);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0.8;
+}
+
+.brand-logo:hover {
+  opacity: 1;
+}
+
+:root.light .brand-logo {
+  filter: none;
+  opacity: 0.7;
+}
+
+:root.light .brand-logo:hover {
+  opacity: 1;
+}
