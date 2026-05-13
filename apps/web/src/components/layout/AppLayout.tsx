@@ -7,6 +7,7 @@ import { UnifiedSidebar } from "../sidebar/UnifiedSidebar";
 import { useCanvasStore } from "../../store/useCanvasStore";
 
 import { ThemeToggle } from "../common/ThemeToggle";
+import { useTheme } from "../../hooks/useTheme";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { toggleLeftSidebar, toggleRightSidebar, setRightSidebarTab, setRightSidebarOpen } =
     useCanvasStore();
+  const { toggleTheme } = useTheme();
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -50,6 +52,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         e.preventDefault();
         setRightSidebarOpen(true);
         setRightSidebarTab("properties");
+      }
+      // Ctrl + Shift + L = Toggle Theme
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "l") {
+        e.preventDefault();
+        toggleTheme();
       }
     };
 
