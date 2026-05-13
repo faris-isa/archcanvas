@@ -6,11 +6,11 @@
   --color-tech-accent: #3b82f6;
   --color-industrial-gold: #d4af37;
   --color-industrial-gray: #4a4a4a;
-  
+
   /* Light mode tokens */
   --color-tech-light: #f8fafc;
   --color-tech-light-gray: #f1f5f9;
-  
+
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
@@ -78,7 +78,7 @@ body {
 /* Brand Logo Support */
 .brand-logo {
   filter: brightness(0) invert(1);
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition: all 0.3s ease;
   opacity: 0.8;
 }
 

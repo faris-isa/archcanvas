@@ -18,7 +18,7 @@ describe("Pipeline Service (Firestore)", () => {
   test("listPipelines should return all pipelines", async () => {
     const list = await pipelineService.listPipelines();
     expect(list.length).toBeGreaterThan(0);
-    expect(list.some(p => p.id === testId)).toBe(true);
+    expect(list.some((p) => p.id === testId)).toBe(true);
   });
 
   test("getPipeline should return the correct pipeline", async () => {

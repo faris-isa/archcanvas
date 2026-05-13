@@ -17,6 +17,7 @@ export type AnalyzeRequest = {
     sourceData: ArchNodeData;
     targetData: ArchNodeData;
   }[];
+  model?: string;
 };
 
 export interface AnalyzeResponse {
@@ -29,7 +30,7 @@ export interface AnalyzeResponse {
     title: string;
     description: string;
     suggestedNodeType?: string;
-    priority: 'low' | 'medium' | 'high';
+    priority: "low" | "medium" | "high";
   }[];
 }
 

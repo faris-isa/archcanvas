@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import type { PipelineSummary } from '@archcanvas/shared';
-import { useReactFlow } from '@xyflow/react';
-import { useCanvasStore } from '../../store/useCanvasStore';
-import { apiClient } from '../../api/client';
+import React, { useEffect, useState } from "react";
+import type { PipelineSummary } from "@archcanvas/shared";
+import { useReactFlow } from "@xyflow/react";
+import { useCanvasStore } from "../../store/useCanvasStore";
+import { apiClient } from "../../api/client";
 
 export const PipelineList: React.FC = () => {
   const [pipelines, setPipelines] = useState<PipelineSummary[]>([]);
@@ -14,7 +14,7 @@ export const PipelineList: React.FC = () => {
       const data = await apiClient.listPipelines();
       setPipelines(data);
     } catch (e) {
-      console.error('Failed to fetch pipelines', e);
+      console.error("Failed to fetch pipelines", e);
     }
   };
 
@@ -30,21 +30,21 @@ export const PipelineList: React.FC = () => {
     try {
       const data = await apiClient.getPipeline(id);
       const flow = data.canvasState;
-      
+
       if (flow) {
         const { x = 0, y = 0, zoom = 1 } = flow.viewport || {};
         rf.setNodes(flow.nodes || []);
         rf.setEdges(flow.edges || []);
         rf.setViewport({ x, y, zoom });
-        
+
         // Also update store to be in sync
-        useCanvasStore.setState({ 
-          nodes: flow.nodes || [], 
-          edges: flow.edges || [] 
+        useCanvasStore.setState({
+          nodes: flow.nodes || [],
+          edges: flow.edges || [],
         });
       }
     } catch (e) {
-      console.error('Failed to load pipeline', e);
+      console.error("Failed to load pipeline", e);
     } finally {
       setLoading(false);
     }
@@ -52,8 +52,12 @@ export const PipelineList: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-2 mt-8 border-t border-industrial-gray pt-6">
-      <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2">Saved Pipelines</h3>
-      {pipelines.length === 0 && <div className="text-[10px] text-gray-600 italic">No saved pipelines</div>}
+      <h3 className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-2">
+        Saved Pipelines
+      </h3>
+      {pipelines.length === 0 && (
+        <div className="text-[10px] text-gray-600 italic">No saved pipelines</div>
+      )}
       <div className="flex flex-col gap-1">
         {pipelines.map((p) => (
           <div key={p.id} className="group relative">

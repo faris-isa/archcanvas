@@ -1,12 +1,12 @@
-import React from 'react';
-import { Search, X, ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
-import { PipelineList } from './PipelineList';
-import { NODE_TYPES } from '../../config/nodeTypes';
-import { getNodeIcon } from '../../utils/nodeIcons';
-import { useCanvasStore } from '../../store/useCanvasStore';
+import React from "react";
+import { Search, X, ChevronLeft, ChevronRight, LayoutDashboard } from "lucide-react";
+import { PipelineList } from "./PipelineList";
+import { NODE_TYPES } from "../../config/nodeTypes";
+import { getNodeIcon } from "../../utils/nodeIcons";
+import { useCanvasStore } from "../../store/useCanvasStore";
 
 export const NodeLibrary: React.FC = () => {
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = React.useState("");
   const leftSidebarOpen = useCanvasStore((state) => state.leftSidebarOpen);
   const toggleLeftSidebar = useCanvasStore((state) => state.toggleLeftSidebar);
 
@@ -14,23 +14,25 @@ export const NodeLibrary: React.FC = () => {
   const setIsOpen = toggleLeftSidebar;
 
   const onDragStart = (event: React.DragEvent, nodeType: string, category: string) => {
-    event.dataTransfer.setData('application/reactflow', nodeType);
-    event.dataTransfer.setData('application/category', category);
-    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData("application/reactflow", nodeType);
+    event.dataTransfer.setData("application/category", category);
+    event.dataTransfer.effectAllowed = "move";
   };
 
-  const filteredNodeTypes = NODE_TYPES.map(cat => ({
+  const filteredNodeTypes = NODE_TYPES.map((cat) => ({
     ...cat,
-    types: cat.types.filter(type =>
-      type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cat.category.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })).filter(cat => cat.types.length > 0);
+    types: cat.types.filter(
+      (type) =>
+        type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        cat.category.toLowerCase().includes(searchQuery.toLowerCase()),
+    ),
+  })).filter((cat) => cat.types.length > 0);
 
   return (
     <div
-      className={`relative h-full bg-[var(--color-bg-secondary)] border-r border-[var(--color-border)] transition-all duration-500 ease-in-out flex flex-shrink-0 ${isOpen ? 'w-72' : 'w-0'
-        }`}
+      className={`relative h-full bg-[var(--color-bg-secondary)] border-r border-[var(--color-border)] transition-all duration-500 ease-in-out flex flex-shrink-0 ${
+        isOpen ? "w-72" : "w-0"
+      }`}
     >
       {/* Toggle Handle (The "Folder" Tab) */}
       <button
@@ -39,26 +41,40 @@ export const NodeLibrary: React.FC = () => {
         title={isOpen ? "Collapse Library" : "Expand Library"}
       >
         {isOpen ? (
-          <ChevronLeft size={16} className="text-industrial-gray group-hover:text-industrial-gold transition-colors" />
+          <ChevronLeft
+            size={16}
+            className="text-industrial-gray group-hover:text-industrial-gold transition-colors"
+          />
         ) : (
           <div className="flex flex-col items-center gap-2">
             <LayoutDashboard size={12} className="text-industrial-gold" />
-            <ChevronRight size={16} className="text-industrial-gray group-hover:text-industrial-gold transition-colors" />
+            <ChevronRight
+              size={16}
+              className="text-industrial-gray group-hover:text-industrial-gold transition-colors"
+            />
           </div>
         )}
       </button>
 
       {/* Main Content */}
-      <div className={`flex flex-col h-full w-72 overflow-hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}>
+      <div
+        className={`flex flex-col h-full w-72 overflow-hidden transition-opacity duration-300 ${
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
         <div className="p-6 border-b border-[var(--color-border)] space-y-4 flex-shrink-0">
           <div>
             <h2 className="text-2xl font-bold text-industrial-gold tracking-tight">Node Library</h2>
-            <p className="text-[10px] text-[var(--color-text-secondary)] uppercase tracking-[0.2em] mt-1 font-semibold">Architectural Components</p>
+            <p className="text-[10px] text-[var(--color-text-secondary)] uppercase tracking-[0.2em] mt-1 font-semibold">
+              Architectural Components
+            </p>
           </div>
 
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-industrial-gray group-focus-within:text-tech-accent transition-colors" size={14} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-industrial-gray group-focus-within:text-tech-accent transition-colors"
+              size={14}
+            />
             <input
               type="text"
               placeholder="Search nodes..."
@@ -68,7 +84,7 @@ export const NodeLibrary: React.FC = () => {
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchQuery("")}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-industrial-gray hover:text-white transition-colors"
               >
                 <X size={14} />
@@ -109,7 +125,9 @@ export const NodeLibrary: React.FC = () => {
           ) : (
             <div className="flex flex-col items-center justify-center py-10 text-center opacity-50">
               <Search size={32} className="text-industrial-gray mb-2" />
-              <p className="text-xs text-industrial-gray">No nodes found matching "{searchQuery}"</p>
+              <p className="text-xs text-industrial-gray">
+                No nodes found matching "{searchQuery}"
+              </p>
             </div>
           )}
         </div>

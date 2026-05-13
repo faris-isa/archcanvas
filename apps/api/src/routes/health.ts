@@ -1,13 +1,13 @@
-import { Hono } from 'hono'
+import { Hono } from "hono";
 
-const health = new Hono()
+const health = new Hono();
 
-health.get('/', (c) => {
+health.get("/", (c) => {
   return c.json({
-    status: 'ok',
+    status: "ok",
     timestamp: new Date().toISOString(),
-    mockMode: !process.env.GEMINI_API_KEY
-  })
-})
+    mockMode: !process.env.GEMINI_API_KEY,
+  });
+});
 
-export default health
+export default health;

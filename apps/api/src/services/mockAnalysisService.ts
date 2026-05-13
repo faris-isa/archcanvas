@@ -1,26 +1,31 @@
-import { AnalyzeRequest, AnalyzeResponse } from '@archcanvas/shared';
+import { AnalyzeRequest, AnalyzeResponse } from "@archcanvas/shared";
 
-export const mockAnalyzeArchitecture = async (request: AnalyzeRequest): Promise<AnalyzeResponse> => {
+export const mockAnalyzeArchitecture = async (
+  request: AnalyzeRequest,
+): Promise<AnalyzeResponse> => {
   // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   const response: AnalyzeResponse = {
-    edges: request.edges.map(edge => {
+    edges: request.edges.map((edge) => {
       const sourceCat = edge.sourceData.category;
       const targetCat = edge.targetData.category;
 
-      let protocol = 'gRPC';
-      let explanation = 'Default high-performance recommendation.';
+      let protocol = "MQTT";
+      let explanation = "Standard lightweight industrial transport.";
 
-      if (sourceCat === 'Edge Devices' && targetCat === 'Storage/Sinks') {
-        protocol = 'MQTT';
-        explanation = 'MQTT is ideal for low-bandwidth edge-to-cloud telemetry.';
-      } else if (sourceCat === 'Edge Devices' && targetCat === 'Transport Layers') {
-        protocol = 'OPC UA';
-        explanation = 'OPC UA provides industrial-standard connectivity for local processing.';
-      } else if (sourceCat === 'Transport Layers' && targetCat === 'Storage/Sinks') {
-        protocol = 'Kafka';
-        explanation = 'Kafka is the standard for high-throughput stream processing to data lakes.';
+      if (sourceCat === "Edge & Sources" && targetCat === "Edge & Sources") {
+        protocol = "Modbus TCP";
+        explanation = "Optimal for floor-level controller-to-controller communication.";
+      } else if (sourceCat === "Edge & Sources" && targetCat === "Industrial Systems") {
+        protocol = "OPC UA";
+        explanation = "Industrial-standard connectivity for control system integration.";
+      } else if (sourceCat.includes("Transport") || targetCat.includes("Transport")) {
+        protocol = "Kafka";
+        explanation = "Reliable backbone for high-throughput stream processing.";
+      } else if (sourceCat.includes("Applications")) {
+        protocol = "gRPC";
+        explanation = "High-performance protocol for application-level services.";
       }
 
       return {

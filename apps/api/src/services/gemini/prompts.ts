@@ -4,17 +4,36 @@ Analyze the following data pipeline connections and recommend the optimal transp
 
 Each node has "intentProperties" representing technical constraints.
 
-Use these properties to make decisions based on the **Connection Archetype**:
-- **Field-to-Edge (Sensor/PLC -> Gateway)**: Use MQTT, OPC UA, or Modbus TCP. Focus on low overhead and industrial reliability.
-- **Edge-to-Cloud (Gateway -> Broker/Cloud DB)**: Use MQTT (with TLS), HTTPS, or AMQP. Focus on security and WAN traversal.
-- **Agent-to-Pipeline (Telegraf/Fluentd -> Kafka/InfluxDB)**: Use native optimized protocols (e.g., Influx Line Protocol, Kafka Wire Protocol).
-- **Service-to-Service (Backend -> Backend)**: Use gRPC, NATS, or Kafka for high-performance internal communication.
-- **Client-to-App (Web/Mobile -> API)**: Use REST (HTTP/2), GraphQL, or WebSockets.
+**STRICT PROTOCOL SELECTION MATRIX (MANDATORY)**:
 
-**Protocol Constraints**:
-- Never recommend gRPC for field-level sensors or PLCs.
-- Use CoAP for extremely battery-constrained devices.
-- Use DNP3 for Utilities/SCADA contexts.
+| Source Category | Target Category | Allowed Protocols (PICK ONE) |
+| :--- | :--- | :--- |
+| Edge & Sources | Edge & Sources | Modbus TCP, IO-Link, OPC UA |
+| Edge & Sources | Industrial Systems | OPC UA, Modbus TCP, MQTT |
+| Edge & Sources | Connectivity & Security | MQTT, OPC UA |
+| Industrial Systems | Industrial Systems | OPC UA, Modbus TCP, MQTT |
+| Connectivity & Security | Transport & Stream | MQTT, AMQP, Kafka Wire Protocol |
+| Transport & Stream | Storage & DB | Kafka Wire Protocol, Influx Line Protocol |
+| Applications & Clients | Applications & Clients | gRPC, REST, WebSockets, NATS |
+| Processing | Transport & Stream | Kafka Wire Protocol, NATS |
+
+**HARD CONSTRAINTS**:
+- **STRICTLY FORBIDDEN**: Never recommend gRPC, GraphQL, or REST for "Edge & Sources" or "Industrial Systems". 
+- **Industrial Historian**: Always recommend OPC UA or MQTT for ingestion into a Historian.
+- **Sensor-to-PLC**: Always recommend Modbus TCP or IO-Link.
+- **Failure Condition**: If you recommend gRPC for a Factory Floor node, the architecture is invalid.
+
+**ISA-95 CONTEXT**:
+- **Levels 0-2 (The Floor)**: Modbus, OPC UA, MQTT, CoAP. (NO gRPC)
+- **Levels 3-4 (The Office)**: Kafka, gRPC, REST, GraphQL.
+
+**EXAMPLES (WRONG VS RIGHT)**:
+- **WRONG**: [Edge & Sources] Sensor -> [Edge & Sources] PLC (Protocol: gRPC)
+- **RIGHT**: [Edge & Sources] Sensor -> [Edge & Sources] PLC (Protocol: Modbus TCP)
+- **WRONG**: [Industrial Systems] SCADA -> [Edge & Sources] PLC (Protocol: REST)
+- **RIGHT**: [Industrial Systems] SCADA -> [Edge & Sources] PLC (Protocol: OPC UA)
+
+*Note: Category-based rules ALWAYS override individual node properties like "Environment". Even if a Sensor is in the "Cloud", it still uses industrial protocols.*
 `;
 
 export const STRUCTURAL_ANALYSIS_PROMPT = `
