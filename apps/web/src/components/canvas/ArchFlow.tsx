@@ -9,8 +9,11 @@ import ProtocolEdge from "./ProtocolEdge";
 import { useTheme } from "../../hooks/useTheme";
 import { getDefaultProperties } from "../../config/nodeSchemas";
 
+import ArchitecturalGroup from "../nodes/MedallionGroup";
+
 const nodeTypes = {
   intentNode: IntentNode,
+  archGroup: ArchitecturalGroup,
 };
 
 const edgeTypes = {
@@ -44,15 +47,18 @@ export const ArchFlow: React.FC = () => {
         y: event.clientY,
       });
 
+      const isGroup = category === "Medallion Layers (Data Engineering)" && type.includes("Layer");
+
       const newNode = {
         id: `${type}-${Date.now()}`,
-        type: "intentNode",
+        type: isGroup ? "archGroup" : "intentNode",
         position,
         data: {
           label: type,
           category,
           intentProperties: getDefaultProperties(type),
         },
+        ...(isGroup ? { style: { width: 400, height: 300 } } : {}),
       };
 
       addNode(newNode);

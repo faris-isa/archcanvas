@@ -73,4 +73,9 @@ export const apiClient = {
     const res = await fetch(`${BASE_URL}/api/diagnostic/gemini`);
     return handleResponse<{ status: string; models: any[] }>(res);
   },
+
+  async getHealth(): Promise<{ status: string; mockMode: boolean }> {
+    const res = await fetch(`${BASE_URL}/api/health`);
+    return handleResponse<{ status: string; mockMode: boolean }>(res);
+  },
 };

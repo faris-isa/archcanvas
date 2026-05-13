@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { VertexAI } from "@google-cloud/vertexai";
 import { AnalyzeRequest, AnalyzeResponse } from "@archcanvas/shared";
-import { PROTOCOL_ANALYSIS_PROMPT, STRUCTURAL_ANALYSIS_PROMPT } from "./prompts";
+import { ARCHITECT_PROMPT, DATA_ENGINEER_PROMPT } from "./prompts";
 
 const API_KEY = process.env.GEMINI_API_KEY || "";
 const PROJECT_ID = process.env.GCLOUD_PROJECT || "archcanvas-dev";
@@ -23,10 +23,6 @@ const getModel = (modelName: string = "gemini-1.5-flash") => {
   }
 };
 
-/**
- * Safely extracts text from a Gemini response, handling differences between
- * @google/generative-ai and @google-cloud/vertexai SDKs.
- */
 const extractText = (response: any): string => {
   if (typeof response.text === "function") {
     try {
@@ -77,7 +73,6 @@ const getAvailableModels = async () => {
 const resolveDynamicModels = async (requested?: string): Promise<string[]> => {
   const models = await getAvailableModels();
 
-  // Sort models by name descending to get newest versions first (e.g., 3.1 > 2.5 > 1.5)
   const flashModels = models
     .filter((m) => m.name.toLowerCase().includes("flash"))
     .sort((a, b) => b.name.localeCompare(a.name));
@@ -89,12 +84,9 @@ const resolveDynamicModels = async (requested?: string): Promise<string[]> => {
   const result: string[] = [];
   if (requested) result.push(requested);
 
-  // Add newest Flash
   if (flashModels.length > 0) result.push(flashModels[0].name.replace("models/", ""));
-  // Add newest Pro
   if (proModels.length > 0) result.push(proModels[0].name.replace("models/", ""));
 
-  // Fallbacks for known stable aliases
   result.push("gemini-flash-latest", "gemini-pro-latest");
 
   return Array.from(new Set(result));
@@ -102,6 +94,8 @@ const resolveDynamicModels = async (requested?: string): Promise<string[]> => {
 
 export const analyzeWithGemini = async (request: AnalyzeRequest): Promise<AnalyzeResponse> => {
   const uniqueModels = await resolveDynamicModels(request.model);
+  const modelName = uniqueModels[0];
+  const model = getModel(modelName);
 
   const connectionList = request.edges
     .map(
@@ -110,69 +104,34 @@ export const analyzeWithGemini = async (request: AnalyzeRequest): Promise<Analyz
     )
     .join("\n\n");
 
-  const fullPrompt = `
-    ${PROTOCOL_ANALYSIS_PROMPT}
-    
-    ${STRUCTURAL_ANALYSIS_PROMPT}
+  const architectTask = `${ARCHITECT_PROMPT}\n\nDATA TO ANALYZE:\n${connectionList}\n\nRespond ONLY with JSON matching the "edges" part of the response schema.`;
+  const engineerTask = `${DATA_ENGINEER_PROMPT}\n\nSYSTEM STATE:\n${JSON.stringify(request.nodes)}\n\nRespond ONLY with JSON matching the "grouping" and "recommendations" parts.`;
 
-    DATA TO ANALYZE:
-    ${connectionList}
+  try {
+    console.log(`Performing Parallel Persona Analysis with model: ${modelName}`);
 
-    FULL SYSTEM STATE (FOR STRUCTURAL CONTEXT):
-    ${JSON.stringify(request.nodes)}
+    const [archResult, engResult] = await Promise.all([
+      model.generateContent(architectTask),
+      model.generateContent(engineerTask),
+    ]);
 
-    Respond ONLY with JSON in the following format:
-    {
-      "edges": [
-        {
-          "edgeId": "string",
-          "recommendedProtocol": "string",
-          "engineeringExplanation": "string"
-        }
-      ],
-      "suggestions": [
-        {
-          "title": "string",
-          "description": "string",
-          "suggestedNodeType": "string",
-          "priority": "low | medium | high"
-        }
-      ]
-    }
-    `;
+    const archText = extractText(archResult.response)
+      .replace(/```json\n?|\n?```/g, "")
+      .trim();
+    const engText = extractText(engResult.response)
+      .replace(/```json\n?|\n?```/g, "")
+      .trim();
 
-  let lastError: any;
+    const archData = JSON.parse(archText);
+    const engData = JSON.parse(engText);
 
-  for (const modelName of uniqueModels) {
-    try {
-      console.log(`Attempting Gemini analysis with model: ${modelName}`);
-      const model = getModel(modelName);
-      const result = await model.generateContent(fullPrompt);
-      const response = await result.response;
-      const responseText = extractText(response);
-      const cleanJson = responseText.replace(/```json\n?|\n?```/g, "").trim();
-      return JSON.parse(cleanJson) as AnalyzeResponse;
-    } catch (err: any) {
-      lastError = err;
-
-      const isRetryable = err.status === 404 || err.status === 503 || err.status === 429;
-
-      if (isRetryable && modelName !== uniqueModels[uniqueModels.length - 1]) {
-        console.warn(
-          `Gemini model ${modelName} failed (Status: ${err.status}), trying next fallback...`,
-        );
-        continue;
-      }
-
-      console.error(`Gemini SDK Detailed Error (Model: ${modelName}):`, {
-        message: err.message,
-        status: err.status,
-        statusText: err.statusText,
-        errorDetails: err.errorDetails,
-      });
-      break;
-    }
+    return {
+      edges: archData.edges || [],
+      suggestions: engData.recommendations || [],
+      grouping: engData.grouping || [],
+    };
+  } catch (err: any) {
+    console.error("Gemini Multi-Persona Analysis Failed:", err);
+    throw err;
   }
-
-  throw lastError;
 };

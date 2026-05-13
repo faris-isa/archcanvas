@@ -1,5 +1,30 @@
 export const NODE_TYPES = [
   {
+    category: "Intent-Based Blueprints",
+    types: [
+      "Generic Data Source",
+      "Stream Buffer",
+      "Analytical Processor",
+      "Storage Sink",
+      "Visualization Portal",
+      "LAN Segment",
+      "WAN Segment",
+      "VPN Tunnel",
+      "Satellite Link",
+      "5G/LTE Network",
+    ],
+  },
+  {
+    category: "Medallion Layers (Data Engineering)",
+    types: [
+      "Bronze Layer (Raw)",
+      "Silver Layer (Cleansed)",
+      "Gold Layer (Aggregated)",
+      "Data Quality Gate",
+      "Schema Registry",
+    ],
+  },
+  {
     category: "Edge & Sources",
     types: [
       "Factory Floor Sensor",

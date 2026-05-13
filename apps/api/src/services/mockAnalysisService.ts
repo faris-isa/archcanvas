@@ -34,6 +34,21 @@ export const mockAnalyzeArchitecture = async (
         engineeringExplanation: explanation,
       };
     }),
+    suggestions: [
+      {
+        title: "Optimize Sensor Ingestion",
+        description: "Use an Edge Gateway to buffer sensor data before sending it over the WAN.",
+        priority: "high",
+      },
+    ],
+    grouping: request.nodes.map((n) => {
+      const label = n.label.toLowerCase();
+      let layer = "Bronze Layer";
+      if (label.includes("processor") || label.includes("silver")) layer = "Silver Layer";
+      if (label.includes("storage") || label.includes("visualization") || label.includes("gold"))
+        layer = "Gold Layer";
+      return { nodeId: n.id || "", groupLabel: layer };
+    }),
   };
 
   return response;
