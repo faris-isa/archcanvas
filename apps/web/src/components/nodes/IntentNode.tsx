@@ -21,6 +21,10 @@ const IntentNode: React.FC<NodeProps> = ({ id, data }) => {
     });
   };
 
+  const isStale = useCanvasStore((s) =>
+    s.edges.some((e) => (e.source === id || e.target === id) && e.data?.isStale),
+  );
+
   const parentNode = useCanvasStore((s) => s.nodes.find((n) => n.id === (data as any).parentId));
   const isHidden = parentNode?.data?.isFolded;
 

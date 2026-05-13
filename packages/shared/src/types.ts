@@ -6,6 +6,7 @@ export type ArchNodeData = {
   label: string;
   category: string;
   intentProperties: IntentValues;
+  isFolded?: boolean;
   templateId?: string; // Reference to custom template if applicable
 };
 
@@ -59,9 +60,28 @@ export interface AnalyzeResponse {
 export type PipelineSummary = {
   id: string;
   name: string;
-  createdAt: string;
   updatedAt: string;
 };
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatRequest {
+  messages: ChatMessage[];
+  canvasState: {
+    nodes: any[];
+    edges: any[];
+  };
+  model?: string;
+}
+
+export interface ChatResponse {
+  content: string;
+  suggestedNodes?: any[];
+  suggestedEdges?: any[];
+}
 
 export type PipelineDetail = {
   id: string;

@@ -3,6 +3,8 @@ import type {
   AnalyzeResponse,
   PipelineSummary,
   PipelineDetail,
+  ChatRequest,
+  ChatResponse,
 } from "@archcanvas/shared";
 import { ApiError, BadRequestError, NotFoundError, ServerError } from "./errors";
 
@@ -26,6 +28,15 @@ export const apiClient = {
       body: JSON.stringify(request),
     });
     return handleResponse<AnalyzeResponse>(res);
+  },
+
+  async chat(request: ChatRequest): Promise<ChatResponse> {
+    const res = await fetch(`${BASE_URL}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    return handleResponse<ChatResponse>(res);
   },
 
   async listPipelines(): Promise<PipelineSummary[]> {

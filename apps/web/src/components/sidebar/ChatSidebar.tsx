@@ -1,27 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Sparkles } from "lucide-react";
+import { useCanvasStore } from "../../store/useCanvasStore";
+import { apiClient } from "../../api/client";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  suggestedNodes?: any[];
+  suggestedEdges?: any[];
 }
 
 export const ChatSidebar: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content:
-        "Hello! I am your IIoT Pipeline Architect. How can I help you design your industrial data flow today?",
-      timestamp: new Date(),
-    },
-  ]);
+  const {
+    nodes,
+    edges,
+    setCanvasState,
+    chatMessages,
+    addChatMessage,
+    isChatTyping,
+    setIsChatTyping,
+  } = useCanvasStore();
+  const selectedModel = useCanvasStore((s) => s.selectedModel);
   const [input, setInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [chatMessages, isChatTyping]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isChatTyping) return;
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -30,20 +42,42 @@ export const ChatSidebar: React.FC = () => {
       timestamp: new Date(),
     };
 
-    setMessages([...messages, userMsg]);
+    addChatMessage(userMsg);
     setInput("");
+    setIsChatTyping(true);
 
-    // Mock response for now
-    setTimeout(() => {
+    try {
+      const updatedMessages = [...chatMessages, userMsg];
+      const response = await apiClient.chat({
+        messages: updatedMessages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+        canvasState: { nodes, edges },
+        model: selectedModel,
+      });
+
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content:
-          "I'm analyzing your request. Since we're in an industrial context, I'd recommend ensuring your Edge Gateways are using OPC-UA for reliable field connectivity.",
+        content: response.content,
+        suggestedNodes: response.suggestedNodes,
+        suggestedEdges: response.suggestedEdges,
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, assistantMsg]);
-    }, 1000);
+      addChatMessage(assistantMsg);
+    } catch (error) {
+      console.error("Chat failed:", error);
+      const errorMsg: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: "I'm sorry, I'm having trouble connecting to the Engineering Council right now.",
+        timestamp: new Date(),
+      };
+      addChatMessage(errorMsg);
+    } finally {
+      setIsChatTyping(false);
+    }
   };
 
   return (
@@ -52,16 +86,16 @@ export const ChatSidebar: React.FC = () => {
       <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-primary)]/50 flex-shrink-0">
         <h2 className="text-sm font-bold text-[var(--color-text-primary)] flex items-center gap-2">
           <Sparkles size={16} />
-          Architect AI
+          Engineering Council AI
         </h2>
         <p className="text-[10px] text-[var(--color-text-secondary)] mt-1">
-          Intent-driven design assistance
+          Architectural consultation with our quad-persona panel
         </p>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
-        {messages.map((msg) => (
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin" ref={scrollRef}>
+        {chatMessages.map((msg) => (
           <div
             key={msg.id}
             className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
@@ -77,10 +111,26 @@ export const ChatSidebar: React.FC = () => {
                 {msg.role === "user" ? <User size={10} /> : <Bot size={10} />}
                 {msg.role}
               </div>
-              {msg.content}
+              <div className="whitespace-pre-wrap">{msg.content}</div>
+
+              {msg.suggestedNodes && (
+                <button
+                  onClick={() => setCanvasState(msg.suggestedNodes!, msg.suggestedEdges || [])}
+                  className="mt-3 w-full py-2 px-3 bg-tech-accent/20 hover:bg-tech-accent/30 border border-tech-accent/50 rounded flex items-center justify-center gap-2 text-[10px] font-bold text-tech-accent transition-all"
+                >
+                  <Sparkles size={12} />
+                  APPLY SUGGESTED LAYOUT
+                </button>
+              )}
             </div>
           </div>
         ))}
+        {isTyping && (
+          <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-secondary)] opacity-50 italic">
+            <Bot size={10} />
+            The council is deliberating...
+          </div>
+        )}
       </div>
 
       {/* Input Area */}
@@ -95,12 +145,14 @@ export const ChatSidebar: React.FC = () => {
                 handleSend();
               }
             }}
-            placeholder="Describe your intent..."
-            className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg py-2 pl-3 pr-10 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-tech-accent/50 transition-all resize-none h-20 placeholder:text-[var(--color-text-secondary)]/40"
+            disabled={isTyping}
+            placeholder={isTyping ? "Council is thinking..." : "Ask the council a question..."}
+            className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg py-2 pl-3 pr-10 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-tech-accent/50 transition-all resize-none h-20 placeholder:text-[var(--color-text-secondary)]/40 disabled:opacity-50"
           />
           <button
             onClick={handleSend}
-            className="absolute right-2 bottom-2 p-1.5 rounded-md bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] hover:text-tech-accent hover:bg-tech-accent/10 transition-all"
+            disabled={isTyping || !input.trim()}
+            className="absolute right-2 bottom-2 p-1.5 rounded-md bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] hover:text-tech-accent hover:bg-tech-accent/10 transition-all disabled:opacity-30"
           >
             <Send size={14} />
           </button>

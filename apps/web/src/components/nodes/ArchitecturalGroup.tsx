@@ -1,5 +1,6 @@
 import React, { memo } from "react";
-import { NodeProps, NodeResizer } from "@xyflow/react";
+import { NodeResizer, type NodeProps } from "@xyflow/react";
+import { useCanvasStore } from "../../store/useCanvasStore";
 
 const ArchitecturalGroup: React.FC<NodeProps> = ({ id, data, selected }) => {
   const label = data.label as string;

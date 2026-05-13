@@ -387,7 +387,6 @@ export const NODE_SCHEMAS: Record<string, NodeSchema> = {
 
   // Industrial & Connectivity
   "Industrial Firewall": CORE_PROPERTIES,
-  "VPN Tunnel": CORE_PROPERTIES,
   "Device Management": AGENT_PROPERTIES,
   "Digital Twin": CORE_PROPERTIES,
   "Metro WAN": STREAMING_PROPERTIES,
