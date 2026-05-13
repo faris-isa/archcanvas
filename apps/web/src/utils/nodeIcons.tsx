@@ -1,28 +1,19 @@
-import React from 'react';
-import { 
-  Cpu, 
-  Database, 
-  Activity, 
-  Zap, 
-  MessageSquare, 
-  Layers, 
-  Server, 
-  HardDrive, 
-  Cloud, 
-  Waves, 
-  Share2, 
-  Terminal, 
-  Webhook, 
-  FileJson, 
-  Table, 
-  BarChart3, 
-  Search, 
-  Bell, 
+import {
+  Cpu,
+  Database,
+  Activity,
+  Zap,
+  MessageSquare,
+  Server,
+  Cloud,
+  Waves,
+  Share2,
+  Terminal,
+  Webhook,
+  Bell,
   Mail,
   Workflow,
-  Compass,
   Gauge,
-  Microscope,
   Box,
   Monitor,
   MonitorSmartphone,
@@ -39,7 +30,6 @@ import {
 
 const BRAND_LOGOS: Record<string, string> = {
   'kafka': 'apachekafka',
-  'influx': 'influxdb',
   'prometheus': 'prometheus',
   'postgres': 'postgresql',
   'mysql': 'mysql',
@@ -55,7 +45,6 @@ const BRAND_LOGOS: Record<string, string> = {
   'telegraf': 'influxdb',
   'influx': 'influxdb',
   'fluentd': 'fluentd',
-  'vector': 'vector',
   'rabbitmq': 'rabbitmq',
   'nats': 'natsdotio',
   'pulsar': 'apachepulsar',
@@ -80,7 +69,6 @@ const BRAND_LOGOS: Record<string, string> = {
   'questdb': 'questdb',
   'victoria': 'victoriametrics',
   'druid': 'apachedruid',
-  'vector': 'vector',
 };
 
 const SPECIAL_LOGOS: Record<string, string> = {
@@ -93,13 +81,13 @@ const SPECIAL_LOGOS: Record<string, string> = {
 
 const getBrandIcon = (label: string, size: number = 18) => {
   const l = label.toLowerCase();
-  
+
   // 1. Try Special Mappings (Direct URLs)
   const specialKey = Object.keys(SPECIAL_LOGOS).find(key => l.includes(key));
   if (specialKey) {
     return (
-      <img 
-        src={SPECIAL_LOGOS[specialKey]} 
+      <img
+        src={SPECIAL_LOGOS[specialKey]}
         alt={label}
         style={{ width: size, height: size }}
         className="brand-logo group-hover:scale-110 transition-transform duration-300"
@@ -112,8 +100,8 @@ const getBrandIcon = (label: string, size: number = 18) => {
   if (brandKey) {
     const slug = BRAND_LOGOS[brandKey];
     return (
-      <img 
-        src={`https://unpkg.com/simple-icons@latest/icons/${slug}.svg`} 
+      <img
+        src={`https://unpkg.com/simple-icons@latest/icons/${slug}.svg`}
         alt={label}
         style={{ width: size, height: size }}
         className="brand-logo group-hover:scale-110 transition-transform duration-300"
@@ -125,7 +113,7 @@ const getBrandIcon = (label: string, size: number = 18) => {
 
 export const getNodeIcon = (label: string) => {
   const l = label.toLowerCase();
-  
+
   // Try to get a brand logo first
   const brandIcon = getBrandIcon(label);
   if (brandIcon) return brandIcon;

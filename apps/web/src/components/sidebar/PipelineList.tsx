@@ -6,7 +6,7 @@ import { apiClient } from '../../api/client';
 
 export const PipelineList: React.FC = () => {
   const [pipelines, setPipelines] = useState<PipelineSummary[]>([]);
-  const { setNodes, setEdges, setViewport } = useReactFlow();
+  const rf = useReactFlow(); // Just get the instance
   const [loading, setLoading] = useState(false);
 
   const fetchPipelines = async () => {
@@ -33,9 +33,9 @@ export const PipelineList: React.FC = () => {
       
       if (flow) {
         const { x = 0, y = 0, zoom = 1 } = flow.viewport || {};
-        setNodes(flow.nodes || []);
-        setEdges(flow.edges || []);
-        setViewport({ x, y, zoom });
+        rf.setNodes(flow.nodes || []);
+        rf.setEdges(flow.edges || []);
+        rf.setViewport({ x, y, zoom });
         
         // Also update store to be in sync
         useCanvasStore.setState({ 

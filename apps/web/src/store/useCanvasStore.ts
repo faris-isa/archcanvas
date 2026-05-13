@@ -25,12 +25,23 @@ interface CanvasState {
   updateNodeData: (nodeId: string, data: Partial<ArchNodeData>) => void;
   setAnalysisResults: (edges: { edgeId: string; recommendedProtocol: string; engineeringExplanation: string }[], suggestions?: { title: string; description: string; suggestedNodeType?: string; priority: 'low' | 'medium' | 'high' }[]) => void;
   suggestions: { title: string; description: string; suggestedNodeType?: string; priority: 'low' | 'medium' | 'high' }[];
+  leftSidebarOpen: boolean;
+  rightSidebarOpen: boolean;
+  toggleLeftSidebar: () => void;
+  toggleRightSidebar: () => void;
+  setRightSidebarOpen: (open: boolean) => void;
 }
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
   nodes: [],
   edges: [],
   suggestions: [],
+  leftSidebarOpen: true,
+  rightSidebarOpen: false,
+
+  toggleLeftSidebar: () => set({ leftSidebarOpen: !get().leftSidebarOpen }),
+  toggleRightSidebar: () => set({ rightSidebarOpen: !get().rightSidebarOpen }),
+  setRightSidebarOpen: (open: boolean) => set({ rightSidebarOpen: open }),
 
   onNodesChange: (changes: NodeChange<Node<ArchNodeData>>[]) => {
     set({

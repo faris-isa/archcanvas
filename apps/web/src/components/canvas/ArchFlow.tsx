@@ -67,6 +67,7 @@ export const ArchFlow: React.FC = () => {
 
   return (
     <div className="flex-1 h-full" ref={reactFlowWrapper}>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
