@@ -44,14 +44,14 @@ export const PropertyPanel: React.FC = () => {
         {isOpen ? (
           <ChevronRight
             size={16}
-            className="text-industrial-gray group-hover:text-industrial-gold transition-colors"
+            className="text-[var(--color-text-secondary)] group-hover:text-tech-accent transition-colors"
           />
         ) : (
           <div className="flex flex-col items-center gap-2">
             <Settings2 size={12} className="text-industrial-gold" />
             <ChevronLeft
               size={16}
-              className="text-industrial-gray group-hover:text-industrial-gold transition-colors"
+              className="text-[var(--color-text-secondary)] group-hover:text-tech-accent transition-colors"
             />
           </div>
         )}
@@ -77,7 +77,7 @@ export const PropertyPanel: React.FC = () => {
           </div>
         ) : (
           <div className="flex-1 flex flex-col h-full">
-            <div className="p-6 border-b border-[var(--color-border)] bg-industrial-gray/10 flex-shrink-0 relative">
+            <div className="p-6 border-b border-[var(--color-border)] bg-[var(--color-bg-primary)]/50 flex-shrink-0 relative">
               <div className="flex flex-col gap-1 pr-8">
                 <span className="text-[10px] uppercase tracking-widest text-tech-accent font-black">
                   Node Configuration
@@ -91,7 +91,7 @@ export const PropertyPanel: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 p-1 text-industrial-gray hover:text-white transition-colors"
+                className="absolute top-4 right-4 p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
               >
                 <X size={16} />
               </button>
@@ -132,14 +132,20 @@ export const PropertyPanel: React.FC = () => {
                 </h4>
                 <div className="bg-[var(--color-bg-primary)]/60 p-4 rounded-lg border border-[var(--color-border)] text-[10px] font-mono text-[var(--color-text-secondary)] space-y-2">
                   <div className="flex justify-between">
-                    <span>ID</span> <span className="text-gray-400">{selectedNode.id}</span>
+                    <span>ID</span>{" "}
+                    <span className="text-[var(--color-text-secondary)] opacity-70">
+                      {selectedNode.id}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>TYPE</span> <span className="text-gray-400">{selectedNode.type}</span>
+                    <span>TYPE</span>{" "}
+                    <span className="text-[var(--color-text-secondary)] opacity-70">
+                      {selectedNode.type}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>COORD</span>{" "}
-                    <span className="text-gray-400">
+                    <span className="text-[var(--color-text-secondary)] opacity-70">
                       X={Math.round(selectedNode.position.x)}, Y=
                       {Math.round(selectedNode.position.y)}
                     </span>

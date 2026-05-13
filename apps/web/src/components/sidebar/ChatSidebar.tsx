@@ -47,14 +47,16 @@ export const ChatSidebar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-tech-gray">
+    <div className="flex flex-col h-full w-full overflow-hidden bg-[var(--color-bg-secondary)]">
       {/* Chat Header */}
-      <div className="p-4 border-b border-industrial-gray bg-industrial-gray/20">
-        <h2 className="text-sm font-bold text-industrial-gold flex items-center gap-2">
+      <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-primary)]/50 flex-shrink-0">
+        <h2 className="text-sm font-bold text-[var(--color-text-primary)] flex items-center gap-2">
           <Sparkles size={16} />
           Architect AI
         </h2>
-        <p className="text-[10px] text-industrial-gray mt-1">Intent-driven design assistance</p>
+        <p className="text-[10px] text-[var(--color-text-secondary)] mt-1">
+          Intent-driven design assistance
+        </p>
       </div>
 
       {/* Messages Area */}
@@ -67,8 +69,8 @@ export const ChatSidebar: React.FC = () => {
             <div
               className={`max-w-[90%] p-3 rounded-lg text-[11px] leading-relaxed ${
                 msg.role === "user"
-                  ? "bg-tech-accent/20 border border-tech-accent/30 text-gray-200"
-                  : "bg-industrial-gray/20 border border-industrial-gray text-gray-300"
+                  ? "bg-tech-accent/20 border border-tech-accent/30 text-[var(--color-text-primary)]"
+                  : "bg-[var(--color-bg-primary)]/50 border border-[var(--color-border)] text-[var(--color-text-secondary)]"
               }`}
             >
               <div className="flex items-center gap-2 mb-1 opacity-50 text-[9px] uppercase font-bold">
@@ -82,7 +84,7 @@ export const ChatSidebar: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-industrial-gray bg-industrial-gray/5">
+      <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-bg-primary)]/30">
         <div className="relative">
           <textarea
             value={input}
@@ -94,16 +96,16 @@ export const ChatSidebar: React.FC = () => {
               }
             }}
             placeholder="Describe your intent..."
-            className="w-full bg-tech-gray/50 border border-industrial-gray rounded-lg py-2 pl-3 pr-10 text-xs text-white focus:outline-none focus:border-industrial-gold/50 transition-all resize-none h-20 placeholder:text-gray-600"
+            className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg py-2 pl-3 pr-10 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-tech-accent/50 transition-all resize-none h-20 placeholder:text-[var(--color-text-secondary)]/40"
           />
           <button
             onClick={handleSend}
-            className="absolute right-2 bottom-2 p-1.5 rounded-md bg-industrial-gray/50 text-industrial-gray hover:text-industrial-gold hover:bg-industrial-gold/10 transition-all"
+            className="absolute right-2 bottom-2 p-1.5 rounded-md bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] hover:text-tech-accent hover:bg-tech-accent/10 transition-all"
           >
             <Send size={14} />
           </button>
         </div>
-        <p className="text-[9px] text-gray-600 mt-2 text-center">
+        <p className="text-[9px] text-[var(--color-text-secondary)] opacity-50 mt-2 text-center">
           Press Enter to send. Shift+Enter for new line.
         </p>
       </div>

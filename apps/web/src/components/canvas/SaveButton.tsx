@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useCanvasStore } from "../../store/useCanvasStore";
 import { useReactFlow } from "@xyflow/react";
 import { apiClient } from "../../api/client";
+import { Shortcut } from "../common/Shortcut";
 
 export const SaveButton: React.FC = () => {
   useCanvasStore();
@@ -30,9 +31,15 @@ export const SaveButton: React.FC = () => {
     <button
       onClick={onSave}
       disabled={loading}
-      className="px-4 py-1.5 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-tech-accent rounded text-sm font-bold transition-colors duration-300 disabled:opacity-50"
+      className="group flex items-center px-4 py-1.5 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-tech-accent rounded text-sm font-bold transition-all duration-300 disabled:opacity-50"
     >
       {loading ? "Saving..." : "Save"}
+      {!loading && (
+        <Shortcut
+          keys={["Ctrl", "S"]}
+          className="opacity-30 group-hover:opacity-100 transition-opacity"
+        />
+      )}
     </button>
   );
 };

@@ -1,3 +1,4 @@
+import { ModelSelector } from "../canvas/ModelSelector";
 import React from "react";
 import { NodeLibrary } from "../sidebar/NodeLibrary";
 import { AnalyzeButton } from "../canvas/AnalyzeButton";
@@ -12,7 +13,8 @@ interface AppLayoutProps {
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  const { toggleLeftSidebar, toggleRightSidebar } = useCanvasStore();
+  const { toggleLeftSidebar, toggleRightSidebar, setRightSidebarTab, setRightSidebarOpen } =
+    useCanvasStore();
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -26,11 +28,34 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         e.preventDefault();
         toggleRightSidebar();
       }
+      // Ctrl + S = Save
+      if (e.ctrlKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        const buttons = Array.from(document.querySelectorAll("button"));
+        const saveBtn = buttons.find((b) => b.textContent?.includes("Save"));
+        if (saveBtn) saveBtn.click();
+      }
+      // Alt + 1, 2, 3 = Change Sidebar Tab
+      if (e.altKey && e.key === "1") {
+        e.preventDefault();
+        setRightSidebarOpen(true);
+        setRightSidebarTab("chat");
+      }
+      if (e.altKey && e.key === "2") {
+        e.preventDefault();
+        setRightSidebarOpen(true);
+        setRightSidebarTab("insights");
+      }
+      if (e.altKey && e.key === "3") {
+        e.preventDefault();
+        setRightSidebarOpen(true);
+        setRightSidebarTab("properties");
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggleLeftSidebar, toggleRightSidebar]);
+  }, [toggleLeftSidebar, toggleRightSidebar, setRightSidebarTab, setRightSidebarOpen]);
 
   return (
     <div className="flex h-screen w-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] transition-colors duration-300">
@@ -42,6 +67,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           </h1>
           <div className="flex items-center gap-4">
             <ThemeToggle />
+            <ModelSelector />
             <AnalyzeButton />
             <SaveButton />
           </div>

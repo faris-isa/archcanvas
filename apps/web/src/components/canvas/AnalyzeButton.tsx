@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useCanvasStore } from "../../store/useCanvasStore";
+import { Shortcut } from "../common/Shortcut";
 import type { AnalyzeRequest } from "@archcanvas/shared";
 import { apiClient } from "../../api/client";
 
 export const AnalyzeButton: React.FC = () => {
-  const { nodes, edges, setAnalysisResults } = useCanvasStore();
+  const { nodes, edges, setAnalysisResults, selectedModel } = useCanvasStore();
   const [loading, setLoading] = useState(false);
   const [mockMode, setMockMode] = useState(false);
 
@@ -33,6 +34,7 @@ export const AnalyzeButton: React.FC = () => {
             targetData: targetNode!.data,
           };
         }),
+        model: selectedModel,
       };
 
       const data = await apiClient.analyzeArchitecture(request);
@@ -73,16 +75,17 @@ export const AnalyzeButton: React.FC = () => {
         title="Shortcut: Ctrl + Enter"
         className={`group relative px-4 py-1.5 rounded text-sm font-bold transition-all duration-300 ${
           loading || edges.length === 0
-            ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+            ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] opacity-50 cursor-not-allowed border border-[var(--color-border)]"
             : "bg-tech-accent text-white hover:bg-blue-600 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]"
         }`}
       >
         <div className="flex items-center gap-2">
           {loading ? "Analyzing..." : "Analyze Architecture"}
-          {!loading && edges.length > 0 && (
-            <span className="text-[10px] opacity-50 font-mono group-hover:opacity-100 transition-opacity">
-              Ctrl + ↵
-            </span>
+          {!loading && (
+            <Shortcut
+              keys={["Ctrl", "Enter"]}
+              className="opacity-50 group-hover:opacity-100 transition-opacity"
+            />
           )}
         </div>
 

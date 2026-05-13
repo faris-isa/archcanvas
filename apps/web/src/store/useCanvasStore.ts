@@ -43,6 +43,8 @@ interface CanvasState {
   toggleLeftSidebar: () => void;
   toggleRightSidebar: () => void;
   setRightSidebarOpen: (open: boolean) => void;
+  rightSidebarTab: "chat" | "insights" | "properties";
+  setRightSidebarTab: (tab: "chat" | "insights" | "properties") => void;
   selectedModel: string;
   setSelectedModel: (model: string) => void;
 }
@@ -53,11 +55,13 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   suggestions: [],
   leftSidebarOpen: true,
   rightSidebarOpen: false,
+  rightSidebarTab: "chat",
   selectedModel: "gemini-flash-latest",
 
   toggleLeftSidebar: () => set({ leftSidebarOpen: !get().leftSidebarOpen }),
   toggleRightSidebar: () => set({ rightSidebarOpen: !get().rightSidebarOpen }),
   setRightSidebarOpen: (open: boolean) => set({ rightSidebarOpen: open }),
+  setRightSidebarTab: (tab: "chat" | "insights" | "properties") => set({ rightSidebarTab: tab }),
   setSelectedModel: (model: string) => set({ selectedModel: model }),
 
   onNodesChange: (changes: NodeChange<Node<ArchNodeData>>[]) => {
