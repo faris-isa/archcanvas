@@ -44,7 +44,7 @@ export const UnifiedSidebar: React.FC = () => {
     >
       {/* Unified Toggle Handle */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen()}
         className="absolute -left-6 top-1/2 -translate-y-1/2 w-6 h-32 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] border-r-0 rounded-l-lg flex flex-col items-center justify-center gap-4 group hover:bg-tech-accent/10 transition-colors shadow-[-4px_0_10px_rgba(0,0,0,0.3)] z-10"
       >
         {isOpen ? (
