@@ -2,7 +2,7 @@ import React from "react";
 import { Lightbulb, AlertTriangle, Plus, Info } from "lucide-react";
 import { useCanvasStore } from "../../store/useCanvasStore";
 
-export const SuggestionSidebar: React.FC<{ forceOpen?: boolean }> = ({ forceOpen }) => {
+export const SuggestionSidebar: React.FC<{ forceOpen?: boolean }> = () => {
   const { suggestions, addNodeByType } = useCanvasStore();
 
   return (
