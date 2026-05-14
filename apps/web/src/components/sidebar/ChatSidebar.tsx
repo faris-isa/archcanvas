@@ -125,7 +125,7 @@ export const ChatSidebar: React.FC = () => {
             </div>
           </div>
         ))}
-        {isTyping && (
+        {isChatTyping && (
           <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-secondary)] opacity-50 italic">
             <Bot size={10} />
             The council is deliberating...
@@ -145,13 +145,13 @@ export const ChatSidebar: React.FC = () => {
                 handleSend();
               }
             }}
-            disabled={isTyping}
-            placeholder={isTyping ? "Council is thinking..." : "Ask the council a question..."}
+            disabled={isChatTyping}
+            placeholder={isChatTyping ? "Council is thinking..." : "Ask the council a question..."}
             className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg py-2 pl-3 pr-10 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-tech-accent/50 transition-all resize-none h-20 placeholder:text-[var(--color-text-secondary)]/40 disabled:opacity-50"
           />
           <button
             onClick={handleSend}
-            disabled={isTyping || !input.trim()}
+            disabled={isChatTyping || !input.trim()}
             className="absolute right-2 bottom-2 p-1.5 rounded-md bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] hover:text-tech-accent hover:bg-tech-accent/10 transition-all disabled:opacity-30"
           >
             <Send size={14} />

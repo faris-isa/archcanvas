@@ -1,5 +1,3 @@
-import { Node, Edge } from "@xyflow/react";
-
 export const OFFSHORE_RIG_EXAMPLE = {
   nodes: [
     {

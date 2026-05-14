@@ -2,7 +2,6 @@ import React, { useCallback, useRef } from "react";
 import { ReactFlow, Controls, Background, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCanvasStore } from "../../store/useCanvasStore";
-import type { IntentValues } from "@archcanvas/shared";
 import IntentNode from "../nodes/IntentNode";
 import ProtocolEdge from "./ProtocolEdge";
 

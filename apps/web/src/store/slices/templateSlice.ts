@@ -10,7 +10,7 @@ export interface TemplateSlice {
 
 export const createTemplateSlice: StateCreator<CanvasState, [], [], TemplateSlice> = (
   set,
-  get,
+  _get,
 ) => ({
   customTemplates: [],
 

@@ -20,7 +20,7 @@ export const pipelineService = {
           updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
         };
       });
-    } catch (e) {
+    } catch {
       console.warn("Firestore unavailable, using memory store for listing");
       return Object.entries(MEMORY_STORE)
         .map(([id, data]) => ({
@@ -45,7 +45,7 @@ export const pipelineService = {
         createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
       };
-    } catch (e) {
+    } catch {
       console.warn("Firestore unavailable, using memory store for get");
       return MEMORY_STORE[id] || null;
     }
@@ -60,7 +60,7 @@ export const pipelineService = {
         updatedAt: FieldValue.serverTimestamp(),
       });
       return docRef.id;
-    } catch (e) {
+    } catch {
       console.warn("Firestore unavailable, saving to memory store");
       const id = `mem-${Date.now()}`;
       const now = new Date().toISOString();
@@ -83,7 +83,7 @@ export const pipelineService = {
       if (name) update.name = name;
       if (canvasState) update.canvasState = canvasState;
       await db.collection(COLLECTION).doc(id).update(update);
-    } catch (e) {
+    } catch {
       console.warn("Firestore unavailable, updating in memory store");
       if (MEMORY_STORE[id]) {
         if (name) MEMORY_STORE[id].name = name;
@@ -96,7 +96,7 @@ export const pipelineService = {
   async deletePipeline(id: string): Promise<void> {
     try {
       await db.collection(COLLECTION).doc(id).delete();
-    } catch (e) {
+    } catch {
       console.warn("Firestore unavailable, deleting from memory store");
       delete MEMORY_STORE[id];
     }

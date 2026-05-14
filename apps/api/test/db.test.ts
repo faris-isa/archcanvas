@@ -1,7 +1,7 @@
 process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
 process.env.GCLOUD_PROJECT = "demo-archcanvas";
 
-import { expect, test, describe, beforeAll } from "vitest";
+import { expect, test, describe } from "vitest";
 import { pipelineService } from "../src/firebase/pipelineService";
 
 describe("Pipeline Service (Firestore)", () => {
@@ -31,6 +31,7 @@ describe("Pipeline Service (Firestore)", () => {
   test("updatePipeline should update pipeline data", async () => {
     await pipelineService.updatePipeline(testId, "Updated Name");
     const updated = await pipelineService.getPipeline(testId);
+    console.log("DEBUG: Updated pipeline result:", JSON.stringify(updated, null, 2));
     expect(updated).toBeDefined();
     expect(updated?.name).toBe("Updated Name");
   });
