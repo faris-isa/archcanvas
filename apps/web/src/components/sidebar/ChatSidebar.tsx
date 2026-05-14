@@ -29,6 +29,12 @@ export const ChatSidebar: React.FC = () => {
   const [input, setInput] = useState("");
   const [rateLimitError, setRateLimitError] = useState<{ retryAfter?: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-focus the textarea when the chat tab mounts
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -203,6 +209,7 @@ export const ChatSidebar: React.FC = () => {
       <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-bg-primary)]/30">
         <div className="relative">
           <textarea
+            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
