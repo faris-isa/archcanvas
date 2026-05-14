@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { X, Plus, Trash2, Settings2, Info, LayoutDashboard } from "lucide-react";
+import { X, Plus, Trash2, Info, LayoutDashboard } from "lucide-react";
 import { useCanvasStore } from "../../store/useCanvasStore";
-import type { CustomNodeTemplate, CustomAttribute } from "@archcanvas/shared";
+import type { CustomNodeTemplate, CustomNodeAttribute } from "@archcanvas/shared";
 import { CustomSelect } from "../common/CustomSelect";
 
 interface TemplateEditorProps {
@@ -13,7 +13,7 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({ onClose }) => {
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Edge & Sources");
-  const [attributes, setAttributes] = useState<CustomAttribute[]>([
+  const [attributes, setAttributes] = useState<CustomNodeAttribute[]>([
     {
       name: "throughput",
       label: "Throughput",
@@ -40,7 +40,7 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({ onClose }) => {
     setAttributes(attributes.filter((_, i) => i !== index));
   };
 
-  const updateAttribute = (index: number, updates: Partial<CustomAttribute>) => {
+  const updateAttribute = (index: number, updates: Partial<CustomNodeAttribute>) => {
     const newAttrs = [...attributes];
     newAttrs[index] = { ...newAttrs[index], ...updates };
     setAttributes(newAttrs);
@@ -183,14 +183,15 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({ onClose }) => {
                         </label>
                         <CustomSelect
                           value={attr.type}
-                          options={["select", "text"]}
+                          options={[
+                            { value: "select", label: "Dropdown (Multi-choice)" },
+                            { value: "text", label: "Input (Custom string)" },
+                            { value: "number", label: "Number" },
+                            { value: "boolean", label: "Toggle (Boolean)" },
+                          ]}
                           onChange={(val) =>
-                            updateAttribute(index, { type: val as "select" | "text" })
+                            updateAttribute(index, { type: val as CustomNodeAttribute["type"] })
                           }
-                          labels={{
-                            select: "Dropdown (Multi-choice)",
-                            text: "Input (Custom string)",
-                          }}
                         />
                       </div>
                     </div>

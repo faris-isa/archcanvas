@@ -1,42 +1,33 @@
-export type IntentProperty = string;
-
-export type IntentValues = Record<string, string>;
-
-export type ArchNodeData = {
+export interface ArchNodeData {
+  [key: string]: unknown;
   label: string;
   category: string;
-  intentProperties: IntentValues;
-  templateId?: string; // Reference to custom template if applicable
-};
+  intentProperties: Record<string, unknown>;
+  isFolded?: boolean;
+  templateId?: string;
+}
 
-export type CustomAttribute = {
+export interface CustomNodeAttribute {
   name: string;
   label: string;
-  type: "select" | "text";
-  options?: string[];
-  default: string;
   description?: string;
-};
+  type: "text" | "number" | "select" | "boolean";
+  options?: string[];
+  default: any;
+}
 
-export type CustomNodeTemplate = {
+export interface CustomNodeTemplate {
   id: string;
   name: string;
   category: string;
-  icon?: string;
-  attributes: CustomAttribute[];
-};
+  attributes: CustomNodeAttribute[];
+}
 
-export type AnalyzeRequest = {
-  nodes: ArchNodeData[];
-  edges: {
-    id: string;
-    source: string;
-    target: string;
-    sourceData: ArchNodeData;
-    targetData: ArchNodeData;
-  }[];
+export interface AnalyzeRequest {
+  nodes: any[];
+  edges: any[];
   model?: string;
-};
+}
 
 export interface AnalyzeResponse {
   edges: {
@@ -66,7 +57,27 @@ export type PipelineSummary = {
 export type PipelineDetail = {
   id: string;
   name: string;
-  canvasState: any; // Native JSON object from Firestore
+  canvasState: any;
   createdAt: string;
   updatedAt: string;
 };
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatRequest {
+  messages: ChatMessage[];
+  canvasState: {
+    nodes: any[];
+    edges: any[];
+  };
+  model?: string;
+}
+
+export interface ChatResponse {
+  content: string;
+  suggestedNodes?: any[];
+  suggestedEdges?: any[];
+}

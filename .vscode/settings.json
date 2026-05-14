@@ -1,0 +1,26 @@
+{
+  // ── Format on Save via oxfmt (vp fmt) ────────────────────────────────────
+  // oxfmt has no native VS Code extension; we shell out via Run on Save.
+  // Install: https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave
+  "editor.formatOnSave": false,
+
+  "emeraldwalk.runonsave": {
+    "autoClearConsole": false,
+    "commands": [
+      {
+        "match": "\\.(js|jsx|ts|tsx|json|jsonc)$",
+        "isAsync": true,
+        "cmd": "cd ${workspaceFolder} && npx vp fmt ${file}"
+      }
+    ]
+  },
+
+  // ── Linter (oxlint via vp lint) ───────────────────────────────────────────
+  "eslint.useFlatConfig": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // ── TypeScript ────────────────────────────────────────────────────────────
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

@@ -31,8 +31,9 @@ export default function ProtocolEdge({
         markerEnd={markerEnd}
         style={{
           ...style,
-          strokeWidth: 2,
           stroke: isStale ? "#f59e0b" : protocol ? "#3b82f6" : "#4a4a4a",
+          strokeWidth: 2,
+          animation: style?.strokeDasharray ? "dashdraw 0.5s linear infinite" : "none",
         }}
       />
       <EdgeLabelRenderer>

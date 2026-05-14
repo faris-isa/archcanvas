@@ -134,6 +134,15 @@ body {
   }
 }
 
+@keyframes dashdraw {
+  from {
+    stroke-dashoffset: 20;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .animate-in {
   animation-duration: 200ms;
   animation-fill-mode: both;

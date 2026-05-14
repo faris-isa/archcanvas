@@ -2,15 +2,17 @@ import React, { useCallback, useRef } from "react";
 import { ReactFlow, Controls, Background, useReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCanvasStore } from "../../store/useCanvasStore";
-import type { IntentValues } from "@archcanvas/shared";
 import IntentNode from "../nodes/IntentNode";
 import ProtocolEdge from "./ProtocolEdge";
 
 import { useTheme } from "../../hooks/useTheme";
 import { getDefaultProperties } from "../../config/nodeSchemas";
 
+import ArchitecturalGroup from "../nodes/ArchitecturalGroup";
+
 const nodeTypes = {
   intentNode: IntentNode,
+  archGroup: ArchitecturalGroup,
 };
 
 const edgeTypes = {
@@ -44,15 +46,18 @@ export const ArchFlow: React.FC = () => {
         y: event.clientY,
       });
 
+      const isGroup = category === "Medallion Layers (Data Engineering)" && type.includes("Layer");
+
       const newNode = {
         id: `${type}-${Date.now()}`,
-        type: "intentNode",
+        type: isGroup ? "archGroup" : "intentNode",
         position,
         data: {
           label: type,
           category,
           intentProperties: getDefaultProperties(type),
         },
+        ...(isGroup ? { style: { width: 400, height: 300 } } : {}),
       };
 
       addNode(newNode);

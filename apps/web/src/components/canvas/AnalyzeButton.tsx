@@ -10,8 +10,8 @@ export const AnalyzeButton: React.FC = () => {
   const [mockMode, setMockMode] = useState(false);
 
   React.useEffect(() => {
-    fetch("/api/health")
-      .then((res) => res.json())
+    apiClient
+      .getHealth()
       .then((data) => setMockMode(!!data.mockMode))
       .catch(() => setMockMode(true));
   }, []);

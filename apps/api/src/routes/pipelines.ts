@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { pipelineService } from "../firebase/pipelineService";
-import { PipelineSummary, PipelineDetail } from "@archcanvas/shared";
 
 const pipelines = new Hono();
 

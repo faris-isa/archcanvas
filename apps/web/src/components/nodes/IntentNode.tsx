@@ -25,6 +25,11 @@ const IntentNode: React.FC<NodeProps> = ({ id, data }) => {
     s.edges.some((e) => (e.source === id || e.target === id) && e.data?.isStale),
   );
 
+  const parentNode = useCanvasStore((s) => s.nodes.find((n) => n.id === (data as any).parentId));
+  const isHidden = parentNode?.data?.isFolded;
+
+  if (isHidden) return null;
+
   return (
     <div
       className={`bg-[var(--color-bg-secondary)] border-2 rounded-md shadow-xl min-w-[220px] transition-all ${

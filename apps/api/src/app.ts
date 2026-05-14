@@ -5,6 +5,7 @@ import health from "./routes/health";
 import pipelines from "./routes/pipelines";
 import analyze from "./routes/analyze";
 import diagnostic from "./routes/diagnostic";
+import chat from "./routes/chat";
 
 const app = new Hono();
 
@@ -16,6 +17,7 @@ app.use("*", cors());
 app.route("/api/health", health);
 app.route("/api/pipelines", pipelines);
 app.route("/api/analyze-architecture", analyze);
+app.route("/api/chat", chat);
 app.route("/api/diagnostic", diagnostic);
 
 // Error handling

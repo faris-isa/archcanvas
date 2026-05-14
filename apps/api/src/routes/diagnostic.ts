@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 
 const diagnostic = new Hono();
 
@@ -29,7 +30,7 @@ diagnostic.get("/gemini", async (c) => {
           httpStatus: response.status,
           error: data,
         },
-        response.status,
+        response.status as ContentfulStatusCode,
       );
     }
 
