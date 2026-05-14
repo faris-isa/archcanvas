@@ -207,6 +207,16 @@ export const chatWithGemini = async (request: ChatRequest): Promise<ChatResponse
       const response = await result.response;
       const fullText = extractText(response);
 
+      // Guard against empty/blocked responses (safety filter, finishReason: OTHER, etc.)
+      if (!fullText.trim()) {
+        const finishReason = response.candidates?.[0]?.finishReason;
+        console.warn(
+          `Model ${modelName} returned empty content (finishReason: ${finishReason}). Falling back...`,
+        );
+        lastError = new Error(`Model ${modelName} returned empty response`);
+        continue;
+      }
+
       // Extract canvas update if present
       let suggestedNodes = undefined;
       let suggestedEdges = undefined;
