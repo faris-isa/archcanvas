@@ -1,30 +1,20 @@
-const PROTOCOL_SELECTION_MATRIX = `
-### PROTOCOL SELECTION MATRIX:
-| Source Category | Target Category | Allowed Protocols |
-| :--- | :--- | :--- |
-| Edge & Sources | Connectivity & Ingestion | Modbus TCP, OPC UA, MQTT, IO-Link |
-| Edge & Sources | Industrial Systems | Modbus TCP, OPC UA |
-| Connectivity & Ingestion | Processing & Storage | MQTT (Sparkplug B), AMQP, Kafka Wire |
-| Processing & Storage | Processing & Storage | Kafka Wire, gRPC, Redis PubSub |
-| Processing & Storage | Application Layer | WebSockets, REST, GraphQL, gRPC |
-| Application Layer | Processing & Storage | REST, gRPC, Redis Protocol |
-| ANY | Databases | JDBC, ODBC, Native TCP (Postgres/Cassandra) |
-`;
+const ARCHITECT_GUIDELINES = `
+### PROTOCOL SELECTION GUIDELINES:
+Instead of a strict matrix, use your deep engineering knowledge to select the absolute best, industry-standard protocol between the specific source and target nodes provided.
+- Context-Aware: Analyze the EXACT labels of the source and target (e.g., "Apache Flink", "Redis", "Shopfloor Sensors") and pick the protocol they natively use to communicate.
+- No Hallucinations: DO NOT default to MQTT for everything. Only use MQTT for IoT/Edge/Broker communication. Internal cluster traffic usually uses gRPC, Native TCP, or specialized wire protocols.
 
-const PROTOCOL_RULES = `
 ### HARD CONSTRAINTS:
-1. **Criticality**: If 'Criticality' is High/Life-Safety, recommend redundant gRPC or persistent Kafka/MQTT. Mention 'Failover' in explanation.
+1. **Criticality**: If 'Criticality' is High/Life-Safety, recommend redundant gRPC or persistent messaging. Mention 'Failover' in explanation.
 2. **Network**: If a link is 'Satellite', use MQTT ONLY. Recommend 'Store and Forward' logic.
-3. **Kafka/Flink**: Connections involving Kafka or Flink MUST use "Kafka Wire Protocol". DO NOT suggest MQTT for Kafka internal traffic.
-4. **Database Storage**: Connections saving data to Postgres/Cassandra must use "Native Driver / TCP".
-5. **Implementation**: For 'Intent-Based Blueprints', start explanation with 'IMPLEMENTATION: [Specific Protocol]'.
+3. **Database Storage**: Connections saving data to databases like Postgres/Cassandra must use "Native Driver / TCP".
+4. **Implementation**: For 'Intent-Based Blueprints', start explanation with 'IMPLEMENTATION: [Specific Protocol]'.
 `;
 
 export const ARCHITECT_PROMPT = `
 You are a Principal Industrial Architect. Mission: Zero-loss connectivity.
-${PROTOCOL_SELECTION_MATRIX}
-${PROTOCOL_RULES}
-Analyze connections for: Network Stability, Data Fidelity, and Latency. Be highly specific about the chosen protocol. Do not default to MQTT unless it is an edge/IoT device connection.
+${ARCHITECT_GUIDELINES}
+Analyze connections for: Network Stability, Data Fidelity, and Latency. Be highly specific about the chosen protocol based on the actual node technologies.
 `;
 
 export const DATA_ENGINEER_PROMPT = `
