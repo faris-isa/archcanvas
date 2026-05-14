@@ -6,7 +6,9 @@ export const analyzeArchitecture = async (request: AnalyzeRequest): Promise<Anal
   if (process.env.GEMINI_API_KEY) {
     try {
       return await analyzeWithGemini(request);
-    } catch (error) {
+    } catch (error: any) {
+      // On quota errors, surface to the caller — don't silently serve mock data
+      if (error.status === 429) throw error;
       console.error("Gemini analysis failed, falling back to mock:", error);
       return await mockAnalyzeArchitecture(request);
     }
@@ -16,12 +18,7 @@ export const analyzeArchitecture = async (request: AnalyzeRequest): Promise<Anal
 
 export const chatWithCouncil = async (request: ChatRequest): Promise<ChatResponse> => {
   if (process.env.GEMINI_API_KEY) {
-    try {
-      return await chatWithGemini(request);
-    } catch (error) {
-      console.error("Gemini chat failed:", error);
-      return { content: "I'm sorry, I'm having trouble reaching the council right now." };
-    }
+    return await chatWithGemini(request); // Let callers handle errors with proper status codes
   }
   return { content: "Chat is currently disabled (no API key found)." };
 };

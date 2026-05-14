@@ -14,9 +14,20 @@ analyze.post("/", async (c) => {
 
     const result = await analyzeArchitecture(body);
     return c.json(result);
-  } catch (error) {
-    console.error("Analysis endpoint error:", error);
-    return c.json({ error: "Internal Server Error during analysis" }, 500);
+  } catch (err: any) {
+    console.error("Analysis endpoint error:", err);
+    const status = err.status ?? 500;
+    const retryAfter = err.errorDetails?.find((d: any) =>
+      d["@type"]?.includes("RetryInfo"),
+    )?.retryDelay;
+    return c.json(
+      {
+        error: status === 429 ? "Rate limit exceeded" : "Internal Server Error during analysis",
+        message: err.message || "An unexpected error occurred",
+        ...(retryAfter && { retryAfter }),
+      },
+      status === 429 ? 429 : 500,
+    );
   }
 });
 
