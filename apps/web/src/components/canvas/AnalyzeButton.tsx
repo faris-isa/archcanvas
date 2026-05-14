@@ -3,11 +3,14 @@ import { useCanvasStore } from "../../store/useCanvasStore";
 import { Shortcut } from "../common/Shortcut";
 import type { AnalyzeRequest } from "@archcanvas/shared";
 import { apiClient } from "../../api/client";
+import { RateLimitError } from "../../api/errors";
+import { RateLimitToast } from "../common/RateLimitToast";
 
 export const AnalyzeButton: React.FC = () => {
   const { nodes, edges, setAnalysisResults, selectedModel } = useCanvasStore();
   const [loading, setLoading] = useState(false);
   const [mockMode, setMockMode] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<{ retryAfter?: string } | null>(null);
 
   React.useEffect(() => {
     apiClient
@@ -41,8 +44,12 @@ export const AnalyzeButton: React.FC = () => {
       setAnalysisResults(data.edges);
     } catch (error: any) {
       console.error("Analysis error:", error);
-      const message = error.data?.error || error.message || "Unknown error";
-      alert(`Analysis failed: ${message}`);
+      if (error instanceof RateLimitError) {
+        setRateLimitError({ retryAfter: error.retryAfter });
+      } else {
+        const message = error.data?.error || error.message || "Unknown error";
+        alert(`Analysis failed: ${message}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -88,12 +95,16 @@ export const AnalyzeButton: React.FC = () => {
             />
           )}
         </div>
-
-        {/* Glow effect on hover */}
         {!loading && edges.length > 0 && (
           <div className="absolute inset-0 rounded bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
         )}
       </button>
+      {rateLimitError && (
+        <RateLimitToast
+          retryAfter={rateLimitError.retryAfter}
+          onDismiss={() => setRateLimitError(null)}
+        />
+      )}
     </div>
   );
 };

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Sparkles } from "lucide-react";
 import { useCanvasStore } from "../../store/useCanvasStore";
 import { apiClient } from "../../api/client";
+import { RateLimitError } from "../../api/errors";
+import { RateLimitToast } from "../common/RateLimitToast";
 
 interface Message {
   id: string;
@@ -24,6 +26,7 @@ export const ChatSidebar: React.FC = () => {
   } = useCanvasStore();
   const selectedModel = useCanvasStore((s) => s.selectedModel);
   const [input, setInput] = useState("");
+  const [rateLimitError, setRateLimitError] = useState<{ retryAfter?: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,13 +71,17 @@ export const ChatSidebar: React.FC = () => {
       addChatMessage(assistantMsg);
     } catch (error) {
       console.error("Chat failed:", error);
-      const errorMsg: Message = {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: "I'm sorry, I'm having trouble connecting to the Engineering Council right now.",
-        timestamp: new Date(),
-      };
-      addChatMessage(errorMsg);
+      if (error instanceof RateLimitError) {
+        setRateLimitError({ retryAfter: error.retryAfter });
+      } else {
+        const errorMsg: Message = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: "I'm sorry, I'm having trouble connecting to the Engineering Council right now.",
+          timestamp: new Date(),
+        };
+        addChatMessage(errorMsg);
+      }
     } finally {
       setIsChatTyping(false);
     }
@@ -130,6 +137,12 @@ export const ChatSidebar: React.FC = () => {
             <Bot size={10} />
             The council is deliberating...
           </div>
+        )}
+        {rateLimitError && (
+          <RateLimitToast
+            retryAfter={rateLimitError.retryAfter}
+            onDismiss={() => setRateLimitError(null)}
+          />
         )}
       </div>
 
