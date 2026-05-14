@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { VertexAI } from "@google-cloud/vertexai";
-import { AnalyzeRequest, AnalyzeResponse } from "@archcanvas/shared";
+import { AnalyzeRequest, AnalyzeResponse, ChatRequest, ChatResponse } from "@archcanvas/shared";
 import { ARCHITECT_PROMPT, DATA_ENGINEER_PROMPT, SECURITY_PROMPT, SRE_PROMPT } from "./prompts";
 
 const API_KEY = process.env.GEMINI_API_KEY || "";
