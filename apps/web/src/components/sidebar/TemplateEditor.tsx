@@ -183,14 +183,15 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({ onClose }) => {
                         </label>
                         <CustomSelect
                           value={attr.type}
-                          options={["select", "text"]}
+                          options={[
+                            { value: "select", label: "Dropdown (Multi-choice)" },
+                            { value: "text", label: "Input (Custom string)" },
+                            { value: "number", label: "Number" },
+                            { value: "boolean", label: "Toggle (Boolean)" },
+                          ]}
                           onChange={(val) =>
-                            updateAttribute(index, { type: val as "select" | "text" })
+                            updateAttribute(index, { type: val as CustomNodeAttribute["type"] })
                           }
-                          labels={{
-                            select: "Dropdown (Multi-choice)",
-                            text: "Input (Custom string)",
-                          }}
                         />
                       </div>
                     </div>
