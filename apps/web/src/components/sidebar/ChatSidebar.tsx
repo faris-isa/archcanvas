@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Sparkles } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { useCanvasStore } from "../../store/useCanvasStore";
 import { apiClient } from "../../api/client";
 import { RateLimitError } from "../../api/errors";
@@ -118,7 +119,59 @@ export const ChatSidebar: React.FC = () => {
                 {msg.role === "user" ? <User size={10} /> : <Bot size={10} />}
                 {msg.role}
               </div>
-              <div className="whitespace-pre-wrap">{msg.content}</div>
+              <div className="whitespace-pre-wrap">
+                {msg.role === "assistant" ? (
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ children }) => (
+                        <p className="font-bold text-[var(--color-text-primary)] text-[12px] mb-1 mt-2">
+                          {children}
+                        </p>
+                      ),
+                      h2: ({ children }) => (
+                        <p className="font-bold text-[var(--color-text-primary)] text-[11px] mb-1 mt-2">
+                          {children}
+                        </p>
+                      ),
+                      h3: ({ children }) => (
+                        <p className="font-semibold text-[var(--color-text-primary)] text-[11px] mb-0.5 mt-1.5">
+                          {children}
+                        </p>
+                      ),
+                      p: ({ children }) => <p className="mb-1.5">{children}</p>,
+                      strong: ({ children }) => (
+                        <strong className="font-bold text-[var(--color-text-primary)]">
+                          {children}
+                        </strong>
+                      ),
+                      em: ({ children }) => <em className="italic opacity-80">{children}</em>,
+                      ul: ({ children }) => (
+                        <ul className="list-disc list-inside mb-1.5 space-y-0.5 pl-1">
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="list-decimal list-inside mb-1.5 space-y-0.5 pl-1">
+                          {children}
+                        </ol>
+                      ),
+                      li: ({ children }) => (
+                        <li className="text-[10px] leading-relaxed">{children}</li>
+                      ),
+                      code: ({ children }) => (
+                        <code className="px-1 py-0.5 rounded text-[9px] font-mono bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-tech-accent">
+                          {children}
+                        </code>
+                      ),
+                      hr: () => <hr className="border-[var(--color-border)] my-2" />,
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                ) : (
+                  msg.content
+                )}
+              </div>
 
               {msg.suggestedNodes && (
                 <button
