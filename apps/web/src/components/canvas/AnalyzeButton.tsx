@@ -3,11 +3,16 @@ import { useCanvasStore } from "../../store/useCanvasStore";
 import { Shortcut } from "../common/Shortcut";
 import type { AnalyzeRequest } from "@archcanvas/shared";
 import { apiClient } from "../../api/client";
+import { RateLimitError } from "../../api/errors";
+import { RateLimitToast } from "../common/RateLimitToast";
+import { ErrorToast } from "../common/ErrorToast";
 
 export const AnalyzeButton: React.FC = () => {
   const { nodes, edges, setAnalysisResults, selectedModel } = useCanvasStore();
   const [loading, setLoading] = useState(false);
   const [mockMode, setMockMode] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<{ retryAfter?: string } | null>(null);
+  const [generalError, setGeneralError] = useState<string | null>(null);
 
   React.useEffect(() => {
     apiClient
@@ -22,27 +27,38 @@ export const AnalyzeButton: React.FC = () => {
     setLoading(true);
     try {
       const request: AnalyzeRequest = {
-        nodes: nodes.map((n) => n.data),
-        edges: edges.map((e) => {
-          const sourceNode = nodes.find((n) => n.id === e.source);
-          const targetNode = nodes.find((n) => n.id === e.target);
-          return {
-            id: e.id,
-            source: e.source,
-            target: e.target,
-            sourceData: sourceNode!.data,
-            targetData: targetNode!.data,
-          };
-        }),
+        // Exclude group container nodes — they're layout artifacts, not real architecture nodes
+        nodes: nodes.filter((n) => n.type !== "archGroup").map((n) => ({ id: n.id, ...n.data })),
+        edges: edges
+          .filter((e) => {
+            const src = nodes.find((n) => n.id === e.source && n.type !== "archGroup");
+            const tgt = nodes.find((n) => n.id === e.target && n.type !== "archGroup");
+            return src && tgt;
+          })
+          .map((e) => {
+            const sourceNode = nodes.find((n) => n.id === e.source);
+            const targetNode = nodes.find((n) => n.id === e.target);
+            return {
+              id: e.id,
+              source: e.source,
+              target: e.target,
+              sourceData: sourceNode!.data,
+              targetData: targetNode!.data,
+            };
+          }),
         model: selectedModel,
       };
 
       const data = await apiClient.analyzeArchitecture(request);
-      setAnalysisResults(data.edges);
+      setAnalysisResults(data.edges, data.suggestions, data.grouping);
     } catch (error: any) {
       console.error("Analysis error:", error);
-      const message = error.data?.error || error.message || "Unknown error";
-      alert(`Analysis failed: ${message}`);
+      if (error instanceof RateLimitError) {
+        setRateLimitError({ retryAfter: error.retryAfter });
+      } else {
+        const message = error.data?.error || error.message || "Unknown error";
+        setGeneralError(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -88,12 +104,23 @@ export const AnalyzeButton: React.FC = () => {
             />
           )}
         </div>
-
-        {/* Glow effect on hover */}
         {!loading && edges.length > 0 && (
           <div className="absolute inset-0 rounded bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
         )}
       </button>
+      {rateLimitError && (
+        <RateLimitToast
+          retryAfter={rateLimitError.retryAfter}
+          onDismiss={() => setRateLimitError(null)}
+        />
+      )}
+      {generalError && (
+        <ErrorToast
+          title="Analysis failed"
+          message={generalError}
+          onDismiss={() => setGeneralError(null)}
+        />
+      )}
     </div>
   );
 };

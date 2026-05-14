@@ -10,9 +10,11 @@ const ArchitecturalGroup: React.FC<NodeProps> = ({ id, data, selected }) => {
   const lowerLabel = label.toLowerCase();
   const isBronze = lowerLabel.includes("bronze");
   const isSilver = lowerLabel.includes("silver");
-  const isGold = lowerLabel.includes("gold");
-  const isEdge = lowerLabel.includes("edge");
-  const isCloud = lowerLabel.includes("cloud");
+  const isGold = lowerLabel.includes("gold") || lowerLabel.includes("storage");
+  const isEdge = lowerLabel.includes("edge") || lowerLabel.includes("acquisition");
+  const isTransport = lowerLabel.includes("transport");
+  const isMedallion = lowerLabel.includes("medallion") || lowerLabel.includes("transformation");
+  const isObservability = lowerLabel.includes("observ") || lowerLabel.includes("quality");
 
   let borderColor = "border-gray-500";
   let bgColor = "bg-gray-500/5";
@@ -24,7 +26,7 @@ const ArchitecturalGroup: React.FC<NodeProps> = ({ id, data, selected }) => {
     bgColor = "bg-[#cd7f32]/5";
     textColor = "text-[#cd7f32]";
     dotColor = "bg-[#cd7f32]";
-  } else if (isSilver) {
+  } else if (isSilver || isMedallion) {
     borderColor = "border-[#c0c0c0]";
     bgColor = "bg-[#c0c0c0]/5";
     textColor = "text-[#c0c0c0]";
@@ -39,11 +41,16 @@ const ArchitecturalGroup: React.FC<NodeProps> = ({ id, data, selected }) => {
     bgColor = "bg-emerald-500/5";
     textColor = "text-emerald-500";
     dotColor = "bg-emerald-500";
-  } else if (isCloud) {
-    borderColor = "border-sky-500";
-    bgColor = "bg-sky-500/5";
-    textColor = "text-sky-500";
-    dotColor = "bg-sky-500";
+  } else if (isTransport) {
+    borderColor = "border-sky-400";
+    bgColor = "bg-sky-400/5";
+    textColor = "text-sky-400";
+    dotColor = "bg-sky-400";
+  } else if (isObservability) {
+    borderColor = "border-violet-400";
+    bgColor = "bg-violet-400/5";
+    textColor = "text-violet-400";
+    dotColor = "bg-violet-400";
   }
 
   const childCount = useCanvasStore((s) => s.nodes.filter((n) => n.parentId === id).length);

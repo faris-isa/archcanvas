@@ -4,8 +4,14 @@ import { createChatSlice, type ChatSlice } from "./slices/chatSlice";
 import { createUISlice, type UISlice } from "./slices/uiSlice";
 import { createTemplateSlice, type TemplateSlice } from "./slices/templateSlice";
 import { createAnalysisSlice, type AnalysisSlice } from "./slices/analysisSlice";
+import { createHistorySlice, type HistorySlice } from "./slices/historySlice";
 
-export type CanvasState = CanvasSlice & ChatSlice & UISlice & TemplateSlice & AnalysisSlice;
+export type CanvasState = CanvasSlice &
+  ChatSlice &
+  UISlice &
+  TemplateSlice &
+  AnalysisSlice &
+  HistorySlice;
 
 export const useCanvasStore = create<CanvasState>((...a) => ({
   ...createCanvasSlice(...a),
@@ -13,4 +19,5 @@ export const useCanvasStore = create<CanvasState>((...a) => ({
   ...createUISlice(...a),
   ...createTemplateSlice(...a),
   ...createAnalysisSlice(...a),
+  ...createHistorySlice(...a),
 }));

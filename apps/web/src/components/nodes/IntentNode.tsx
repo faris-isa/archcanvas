@@ -59,21 +59,23 @@ const IntentNode: React.FC<NodeProps> = ({ id, data }) => {
       </div>
 
       <div className="p-3 flex flex-col gap-3 bg-[var(--color-bg-secondary)]/50 rounded-b-md">
-        {Object.entries(archData.intentProperties).map(([prop, value]) => {
-          const propSchema = schema[prop];
-          const label = propSchema?.label || prop.replace(/-/g, " ");
-          const options = propSchema?.options || [value];
+        {(Object.entries(archData.intentProperties || {}) as [string, string][]).map(
+          ([prop, value]) => {
+            const propSchema = schema[prop];
+            const label = propSchema?.label || prop.replace(/-/g, " ");
+            const options = propSchema?.options || [value];
 
-          return (
-            <CustomSelect
-              key={prop}
-              label={label}
-              value={value}
-              options={options}
-              onChange={(val) => onPropertyChange(prop, val)}
-            />
-          );
-        })}
+            return (
+              <CustomSelect
+                key={prop}
+                label={label}
+                value={value}
+                options={options}
+                onChange={(val) => onPropertyChange(prop, val)}
+              />
+            );
+          },
+        )}
       </div>
 
       <Handle

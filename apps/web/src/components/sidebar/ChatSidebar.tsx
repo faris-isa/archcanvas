@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Sparkles } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { useCanvasStore } from "../../store/useCanvasStore";
 import { apiClient } from "../../api/client";
+import { RateLimitError } from "../../api/errors";
+import { RateLimitToast } from "../common/RateLimitToast";
 
 interface Message {
   id: string;
@@ -10,6 +13,12 @@ interface Message {
   timestamp: Date;
   suggestedNodes?: any[];
   suggestedEdges?: any[];
+  suggestedGrouping?: { nodeId: string; groupLabel: string }[];
+  suggestedEdgeProtocols?: {
+    edgeId: string;
+    recommendedProtocol: string;
+    engineeringExplanation: string;
+  }[];
 }
 
 export const ChatSidebar: React.FC = () => {
@@ -24,7 +33,17 @@ export const ChatSidebar: React.FC = () => {
   } = useCanvasStore();
   const selectedModel = useCanvasStore((s) => s.selectedModel);
   const [input, setInput] = useState("");
+  const [rateLimitError, setRateLimitError] = useState<{ retryAfter?: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-focus the textarea when the chat tab mounts.
+  // Delay matches the sidebar's opacity transition (300ms) so the element
+  // is visible before focus() is called — browsers ignore focus on hidden elements.
+  useEffect(() => {
+    const timer = setTimeout(() => inputRef.current?.focus(), 320);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -63,18 +82,24 @@ export const ChatSidebar: React.FC = () => {
         content: response.content,
         suggestedNodes: response.suggestedNodes,
         suggestedEdges: response.suggestedEdges,
+        suggestedGrouping: response.suggestedGrouping,
+        suggestedEdgeProtocols: response.suggestedEdgeProtocols,
         timestamp: new Date(),
       };
       addChatMessage(assistantMsg);
     } catch (error) {
       console.error("Chat failed:", error);
-      const errorMsg: Message = {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: "I'm sorry, I'm having trouble connecting to the Engineering Council right now.",
-        timestamp: new Date(),
-      };
-      addChatMessage(errorMsg);
+      if (error instanceof RateLimitError) {
+        setRateLimitError({ retryAfter: error.retryAfter });
+      } else {
+        const errorMsg: Message = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: "I'm sorry, I'm having trouble connecting to the Engineering Council right now.",
+          timestamp: new Date(),
+        };
+        addChatMessage(errorMsg);
+      }
     } finally {
       setIsChatTyping(false);
     }
@@ -111,11 +136,136 @@ export const ChatSidebar: React.FC = () => {
                 {msg.role === "user" ? <User size={10} /> : <Bot size={10} />}
                 {msg.role}
               </div>
-              <div className="whitespace-pre-wrap">{msg.content}</div>
+              <div className="whitespace-pre-wrap">
+                {msg.role === "assistant" ? (
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ children }) => (
+                        <p className="font-bold text-[var(--color-text-primary)] text-[12px] mb-1 mt-2">
+                          {children}
+                        </p>
+                      ),
+                      h2: ({ children }) => (
+                        <p className="font-bold text-[var(--color-text-primary)] text-[11px] mb-1 mt-2">
+                          {children}
+                        </p>
+                      ),
+                      h3: ({ children }) => (
+                        <p className="font-semibold text-[var(--color-text-primary)] text-[11px] mb-0.5 mt-1.5">
+                          {children}
+                        </p>
+                      ),
+                      p: ({ children }) => <p className="mb-1.5">{children}</p>,
+                      strong: ({ children }) => (
+                        <strong className="font-bold text-[var(--color-text-primary)]">
+                          {children}
+                        </strong>
+                      ),
+                      em: ({ children }) => <em className="italic opacity-80">{children}</em>,
+                      ul: ({ children }) => (
+                        <ul className="list-disc list-inside mb-1.5 space-y-0.5 pl-1">
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="list-decimal list-inside mb-1.5 space-y-0.5 pl-1">
+                          {children}
+                        </ol>
+                      ),
+                      li: ({ children }) => (
+                        <li className="text-[10px] leading-relaxed">{children}</li>
+                      ),
+                      code: ({ children }) => (
+                        <code className="px-1 py-0.5 rounded text-[9px] font-mono bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-tech-accent">
+                          {children}
+                        </code>
+                      ),
+                      hr: () => <hr className="border-[var(--color-border)] my-2" />,
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                ) : (
+                  msg.content
+                )}
+              </div>
 
               {msg.suggestedNodes && (
                 <button
-                  onClick={() => setCanvasState(msg.suggestedNodes!, msg.suggestedEdges || [])}
+                  onClick={() => {
+                    const currentNodes = useCanvasStore.getState().nodes;
+                    const currentEdges = useCanvasStore.getState().edges;
+                    const suggested = msg.suggestedNodes!;
+                    const suggestedEdges = msg.suggestedEdges || [];
+
+                    // Merge strategy: update existing nodes by id or label, add new ones
+                    const mergedNodes = [...currentNodes];
+                    suggested.forEach((sNode: any) => {
+                      const existingIdx = mergedNodes.findIndex(
+                        (n) => n.id === sNode.id || n.data?.label === sNode.data?.label,
+                      );
+                      if (existingIdx >= 0) {
+                        mergedNodes[existingIdx] = {
+                          ...mergedNodes[existingIdx],
+                          data: {
+                            ...mergedNodes[existingIdx].data,
+                            ...sNode.data,
+                            intentProperties: {
+                              ...mergedNodes[existingIdx].data?.intentProperties,
+                              ...sNode.data?.intentProperties,
+                            },
+                          },
+                        };
+                      } else {
+                        mergedNodes.push({ ...sNode, parentId: undefined, extent: undefined });
+                      }
+                    });
+
+                    // Merge edges: add new ones, keep existing
+                    const mergedEdgeIds = new Set(currentEdges.map((e: any) => e.id));
+                    const newEdges = [
+                      ...currentEdges,
+                      ...suggestedEdges.filter((e: any) => !mergedEdgeIds.has(e.id)),
+                    ];
+
+                    // Apply merged data/edges first
+                    setCanvasState(mergedNodes, newEdges);
+
+                    // Build the final grouping for the layout pass
+                    const { setAnalysisResults } = useCanvasStore.getState();
+                    const allNodes = useCanvasStore.getState().nodes;
+                    const intentNodes = allNodes.filter((n) => n.type !== "archGroup");
+                    const groupNodes = allNodes.filter((n) => n.type === "archGroup");
+
+                    // Start from AI-provided grouping (if present), then fill in
+                    // any nodes the AI didn't mention using their existing parentId
+                    const aiGrouping: { nodeId: string; groupLabel: string }[] =
+                      msg.suggestedGrouping ? [...msg.suggestedGrouping] : [];
+                    const aiGroupedIds = new Set(aiGrouping.map((g) => g.nodeId));
+
+                    intentNodes.forEach((n) => {
+                      if (!aiGroupedIds.has(n.id) && n.parentId) {
+                        const parentLabel = groupNodes.find((g) => g.id === n.parentId)?.data
+                          ?.label as string;
+                        if (parentLabel) aiGrouping.push({ nodeId: n.id, groupLabel: parentLabel });
+                      }
+                    });
+
+                    if (aiGrouping.length > 0) {
+                      // Strip old groups + parentIds so layout rebuilds fresh
+                      const strippedNodes = intentNodes.map((n) => ({
+                        ...n,
+                        parentId: undefined,
+                        extent: undefined,
+                      }));
+                      useCanvasStore.setState({ nodes: strippedNodes });
+                      // Pass edge protocol annotations alongside grouping
+                      setAnalysisResults(msg.suggestedEdgeProtocols ?? [], undefined, aiGrouping);
+                    } else if (msg.suggestedEdgeProtocols?.length) {
+                      // No grouping changes but there are protocol annotations — apply them
+                      setAnalysisResults(msg.suggestedEdgeProtocols, undefined, undefined);
+                    }
+                  }}
                   className="mt-3 w-full py-2 px-3 bg-tech-accent/20 hover:bg-tech-accent/30 border border-tech-accent/50 rounded flex items-center justify-center gap-2 text-[10px] font-bold text-tech-accent transition-all"
                 >
                   <Sparkles size={12} />
@@ -131,12 +281,19 @@ export const ChatSidebar: React.FC = () => {
             The council is deliberating...
           </div>
         )}
+        {rateLimitError && (
+          <RateLimitToast
+            retryAfter={rateLimitError.retryAfter}
+            onDismiss={() => setRateLimitError(null)}
+          />
+        )}
       </div>
 
       {/* Input Area */}
       <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-bg-primary)]/30">
         <div className="relative">
           <textarea
+            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {

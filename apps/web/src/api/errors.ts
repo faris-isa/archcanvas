@@ -30,3 +30,13 @@ export class ServerError extends ApiError {
     this.name = "ServerError";
   }
 }
+
+export class RateLimitError extends ApiError {
+  public retryAfter?: string;
+
+  constructor(message: string, retryAfter?: string) {
+    super(message, 429);
+    this.name = "RateLimitError";
+    this.retryAfter = retryAfter;
+  }
+}

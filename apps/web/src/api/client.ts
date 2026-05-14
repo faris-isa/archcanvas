@@ -6,13 +6,15 @@ import type {
   ChatRequest,
   ChatResponse,
 } from "@archcanvas/shared";
-import { ApiError, BadRequestError, NotFoundError, ServerError } from "./errors";
+import { ApiError, BadRequestError, NotFoundError, RateLimitError, ServerError } from "./errors";
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     if (res.status === 400) throw new BadRequestError(data.error || "Bad Request", data);
     if (res.status === 404) throw new NotFoundError(data.error || "Not Found");
+    if (res.status === 429)
+      throw new RateLimitError(data.error || "Rate limit exceeded", data.retryAfter);
     throw new ServerError(data.error || "Internal Server Error", res.status);
   }
   return res.json();
