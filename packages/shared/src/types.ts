@@ -80,4 +80,10 @@ export interface ChatResponse {
   content: string;
   suggestedNodes?: any[];
   suggestedEdges?: any[];
+  suggestedGrouping?: { nodeId: string; groupLabel: string }[];
+  suggestedEdgeProtocols?: {
+    edgeId: string;
+    recommendedProtocol: string;
+    engineeringExplanation: string;
+  }[];
 }

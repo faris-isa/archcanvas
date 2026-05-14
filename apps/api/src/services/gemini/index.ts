@@ -103,6 +103,35 @@ export const analyzeWithGemini = async (request: AnalyzeRequest): Promise<Analyz
       const model = getModel(modelName, true);
       console.log(`Performing Quad-Persona Analysis with model: ${modelName}`);
 
+      const context = `\n\nCANVAS STATE:\nNodes: ${JSON.stringify(request.nodes)}\nEdges: ${JSON.stringify(request.edges)}`;
+
+      const tasks = [
+        {
+          prompt:
+            ARCHITECT_PROMPT +
+            context +
+            `\n\nReturn JSON exactly in this format: { "edges": [{ "edgeId": "...", "recommendedProtocol": "...", "engineeringExplanation": "..." }] }`,
+        },
+        {
+          prompt:
+            DATA_ENGINEER_PROMPT +
+            context +
+            `\n\nCRITICAL: You MUST assign EVERY node (using the exact node "id" field from CANVAS STATE) into one of these 5 architectural layers:\n1. "Edge Acquisition Layer" — sensors, PLCs, gateways, OPC-UA, SCADA, HMI, edge devices\n2. "Transport Layer" — Kafka, RabbitMQ, NATS, Pub/Sub, network segments, VPN, WAN links\n3. "Medallion Transformation Engine" — processors, Spark, Flink, Bronze/Silver layers, Quality Gates, Schema Registry\n4. "Gold Storage Layer" — databases, data lakes, InfluxDB, ClickHouse, Snowflake, storage sinks\n5. "Observability & Quality Gate Sinks" — Grafana, dashboards, alerts, webhooks, visualization portals\n\nReturn JSON exactly in this format (grouping must contain ALL node IDs): { "grouping": [{ "nodeId": "<exact node id>", "groupLabel": "<one of the 5 layers above>" }], "recommendations": [{ "title": "...", "description": "...", "priority": "medium" }] }`,
+        },
+        {
+          prompt:
+            SECURITY_PROMPT +
+            context +
+            `\n\nReturn JSON exactly in this format: { "recommendations": [{ "title": "...", "description": "...", "priority": "high" }] }`,
+        },
+        {
+          prompt:
+            SRE_PROMPT +
+            context +
+            `\n\nReturn JSON exactly in this format: { "recommendations": [{ "title": "...", "description": "...", "priority": "high" }] }`,
+        },
+      ];
+
       const results = await Promise.all(tasks.map((t) => model.generateContent(t.prompt)));
 
       const parsedData = results.map((r) => {
@@ -133,9 +162,14 @@ export const analyzeWithGemini = async (request: AnalyzeRequest): Promise<Analyz
         }),
       };
     } catch (err: any) {
-      if (err.status === 429 || err.status >= 500) {
+      if (
+        err.status === 429 ||
+        err.status >= 500 ||
+        err.name === "TypeError" ||
+        err.message?.includes("fetch failed")
+      ) {
         console.warn(
-          `Model ${modelName} failed with status ${err.status} (e.g. Quota Exceeded). Falling back... Error: ${err.message || err}`,
+          `Model ${modelName} failed with status ${err.status || "network error"} (e.g. Quota Exceeded/Fetch Failed). Falling back... Error: ${err.message || err}`,
         );
         lastError = err;
         continue;
@@ -174,8 +208,21 @@ export const chatWithGemini = async (request: ChatRequest): Promise<ChatResponse
         - If asked to advice on a NEW architecture or MAJOR change, you can suggest a canvas update.
         
         CANVAS UPDATES:
-        If you want to suggest a new set of nodes and edges, append a JSON block at the END of your message wrapped in <canvas_update> tags.
+        If you want to suggest architectural changes (new nodes, moved nodes, regrouping, or protocol annotations), append a JSON block at the END of your message wrapped in <canvas_update> tags.
         CRITICAL: Every node MUST include a "category" string and an "intentProperties" object. If you omit these, the frontend will crash.
+
+        GROUPING: Use the "grouping" array to assign nodes to architectural layers. Valid layer names are:
+          - "Edge Acquisition Layer"
+          - "Transport Layer"
+          - "Medallion Transformation Engine"
+          - "Gold Storage Layer"
+          - "Observability & Quality Gate Sinks"
+        ALWAYS include a grouping entry for every node you mention (existing or new).
+
+        EDGE PROTOCOLS: Use the "edgeProtocols" array to annotate connections with the correct wire protocol.
+        Reference the edge by its existing id, or use the source→target node ids to identify it.
+        Example protocols: "Kafka Wire Protocol", "OPC UA Binary", "MQTT", "gRPC", "REST/HTTP", "JDBC/Native TCP", "CQL/Native TCP", "RESP (Redis Protocol)"
+
         Format:
         <canvas_update>
         {
@@ -184,15 +231,21 @@ export const chatWithGemini = async (request: ChatRequest): Promise<ChatResponse
               "id": "node-1", 
               "type": "intentNode", 
               "data": { 
-                "label": "PLC", 
-                "category": "Edge & Sources", 
-                "intentProperties": {} 
+                "label": "Apache Flink", 
+                "category": "Processing", 
+                "intentProperties": { "environment": "cloud", "job": "Stream processing" } 
               }, 
               "position": { "x": 0, "y": 0 } 
             }
           ],
           "edges": [
             { "id": "edge-1", "source": "node-1", "target": "node-2" }
+          ],
+          "grouping": [
+            { "nodeId": "node-1", "groupLabel": "Medallion Transformation Engine" }
+          ],
+          "edgeProtocols": [
+            { "edgeId": "edge-1", "recommendedProtocol": "Kafka Wire Protocol", "engineeringExplanation": "Flink consumes from Kafka topics" }
           ]
         }
         </canvas_update>
@@ -230,6 +283,10 @@ export const chatWithGemini = async (request: ChatRequest): Promise<ChatResponse
       // Extract canvas update if present
       let suggestedNodes = undefined;
       let suggestedEdges = undefined;
+      let suggestedGrouping: { nodeId: string; groupLabel: string }[] | undefined = undefined;
+      let suggestedEdgeProtocols:
+        | { edgeId: string; recommendedProtocol: string; engineeringExplanation: string }[]
+        | undefined = undefined;
 
       const updateMatch = fullText.match(/<canvas_update>([\s\S]*?)<\/canvas_update>/);
       let cleanedText = fullText;
@@ -239,6 +296,8 @@ export const chatWithGemini = async (request: ChatRequest): Promise<ChatResponse
           const updateData = JSON.parse(updateMatch[1].trim());
           suggestedNodes = updateData.nodes;
           suggestedEdges = updateData.edges;
+          suggestedGrouping = updateData.grouping;
+          suggestedEdgeProtocols = updateData.edgeProtocols;
           cleanedText = fullText.replace(/<canvas_update>[\s\S]*?<\/canvas_update>/, "").trim();
         } catch (e) {
           console.error("Failed to parse suggested canvas update", e);
@@ -249,11 +308,18 @@ export const chatWithGemini = async (request: ChatRequest): Promise<ChatResponse
         content: cleanedText,
         suggestedNodes,
         suggestedEdges,
+        suggestedGrouping,
+        suggestedEdgeProtocols,
       };
     } catch (err: any) {
-      if (err.status === 429 || err.status >= 500) {
+      if (
+        err.status === 429 ||
+        err.status >= 500 ||
+        err.name === "TypeError" ||
+        err.message?.includes("fetch failed")
+      ) {
         console.warn(
-          `Model ${modelName} failed with status ${err.status} (e.g. Quota Exceeded). Falling back... Error: ${err.message || err}`,
+          `Model ${modelName} failed with status ${err.status || "network error"} (e.g. Quota Exceeded/Fetch Failed). Falling back... Error: ${err.message || err}`,
         );
         lastError = err;
         continue;

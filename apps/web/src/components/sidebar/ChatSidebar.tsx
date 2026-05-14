@@ -13,6 +13,12 @@ interface Message {
   timestamp: Date;
   suggestedNodes?: any[];
   suggestedEdges?: any[];
+  suggestedGrouping?: { nodeId: string; groupLabel: string }[];
+  suggestedEdgeProtocols?: {
+    edgeId: string;
+    recommendedProtocol: string;
+    engineeringExplanation: string;
+  }[];
 }
 
 export const ChatSidebar: React.FC = () => {
@@ -31,9 +37,12 @@ export const ChatSidebar: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-focus the textarea when the chat tab mounts
+  // Auto-focus the textarea when the chat tab mounts.
+  // Delay matches the sidebar's opacity transition (300ms) so the element
+  // is visible before focus() is called — browsers ignore focus on hidden elements.
   useEffect(() => {
-    inputRef.current?.focus();
+    const timer = setTimeout(() => inputRef.current?.focus(), 320);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -73,6 +82,8 @@ export const ChatSidebar: React.FC = () => {
         content: response.content,
         suggestedNodes: response.suggestedNodes,
         suggestedEdges: response.suggestedEdges,
+        suggestedGrouping: response.suggestedGrouping,
+        suggestedEdgeProtocols: response.suggestedEdgeProtocols,
         timestamp: new Date(),
       };
       addChatMessage(assistantMsg);
@@ -181,7 +192,80 @@ export const ChatSidebar: React.FC = () => {
 
               {msg.suggestedNodes && (
                 <button
-                  onClick={() => setCanvasState(msg.suggestedNodes!, msg.suggestedEdges || [])}
+                  onClick={() => {
+                    const currentNodes = useCanvasStore.getState().nodes;
+                    const currentEdges = useCanvasStore.getState().edges;
+                    const suggested = msg.suggestedNodes!;
+                    const suggestedEdges = msg.suggestedEdges || [];
+
+                    // Merge strategy: update existing nodes by id or label, add new ones
+                    const mergedNodes = [...currentNodes];
+                    suggested.forEach((sNode: any) => {
+                      const existingIdx = mergedNodes.findIndex(
+                        (n) => n.id === sNode.id || n.data?.label === sNode.data?.label,
+                      );
+                      if (existingIdx >= 0) {
+                        mergedNodes[existingIdx] = {
+                          ...mergedNodes[existingIdx],
+                          data: {
+                            ...mergedNodes[existingIdx].data,
+                            ...sNode.data,
+                            intentProperties: {
+                              ...mergedNodes[existingIdx].data?.intentProperties,
+                              ...sNode.data?.intentProperties,
+                            },
+                          },
+                        };
+                      } else {
+                        mergedNodes.push({ ...sNode, parentId: undefined, extent: undefined });
+                      }
+                    });
+
+                    // Merge edges: add new ones, keep existing
+                    const mergedEdgeIds = new Set(currentEdges.map((e: any) => e.id));
+                    const newEdges = [
+                      ...currentEdges,
+                      ...suggestedEdges.filter((e: any) => !mergedEdgeIds.has(e.id)),
+                    ];
+
+                    // Apply merged data/edges first
+                    setCanvasState(mergedNodes, newEdges);
+
+                    // Build the final grouping for the layout pass
+                    const { setAnalysisResults } = useCanvasStore.getState();
+                    const allNodes = useCanvasStore.getState().nodes;
+                    const intentNodes = allNodes.filter((n) => n.type !== "archGroup");
+                    const groupNodes = allNodes.filter((n) => n.type === "archGroup");
+
+                    // Start from AI-provided grouping (if present), then fill in
+                    // any nodes the AI didn't mention using their existing parentId
+                    const aiGrouping: { nodeId: string; groupLabel: string }[] =
+                      msg.suggestedGrouping ? [...msg.suggestedGrouping] : [];
+                    const aiGroupedIds = new Set(aiGrouping.map((g) => g.nodeId));
+
+                    intentNodes.forEach((n) => {
+                      if (!aiGroupedIds.has(n.id) && n.parentId) {
+                        const parentLabel = groupNodes.find((g) => g.id === n.parentId)?.data
+                          ?.label as string;
+                        if (parentLabel) aiGrouping.push({ nodeId: n.id, groupLabel: parentLabel });
+                      }
+                    });
+
+                    if (aiGrouping.length > 0) {
+                      // Strip old groups + parentIds so layout rebuilds fresh
+                      const strippedNodes = intentNodes.map((n) => ({
+                        ...n,
+                        parentId: undefined,
+                        extent: undefined,
+                      }));
+                      useCanvasStore.setState({ nodes: strippedNodes });
+                      // Pass edge protocol annotations alongside grouping
+                      setAnalysisResults(msg.suggestedEdgeProtocols ?? [], undefined, aiGrouping);
+                    } else if (msg.suggestedEdgeProtocols?.length) {
+                      // No grouping changes but there are protocol annotations — apply them
+                      setAnalysisResults(msg.suggestedEdgeProtocols, undefined, undefined);
+                    }
+                  }}
                   className="mt-3 w-full py-2 px-3 bg-tech-accent/20 hover:bg-tech-accent/30 border border-tech-accent/50 rounded flex items-center justify-center gap-2 text-[10px] font-bold text-tech-accent transition-all"
                 >
                   <Sparkles size={12} />

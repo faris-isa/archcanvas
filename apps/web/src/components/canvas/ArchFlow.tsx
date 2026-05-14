@@ -20,10 +20,16 @@ const edgeTypes = {
 };
 
 export const ArchFlow: React.FC = () => {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } = useCanvasStore();
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode, pushHistory } =
+    useCanvasStore();
   const { theme } = useTheme();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition } = useReactFlow();
+
+  // Snapshot BEFORE drag so undo restores the pre-move position
+  const onNodeDragStart = useCallback(() => {
+    pushHistory();
+  }, [pushHistory]);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -78,6 +84,7 @@ export const ArchFlow: React.FC = () => {
         onConnect={onConnect}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        onNodeDragStart={onNodeDragStart}
         deleteKeyCode={["Backspace", "Delete"]}
         multiSelectionKeyCode="Control"
         selectionKeyCode="Shift"

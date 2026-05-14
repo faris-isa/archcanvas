@@ -32,18 +32,22 @@ export const createCanvasSlice: StateCreator<CanvasState, [], [], CanvasSlice> =
   edges: [],
 
   onNodesChange: (changes: NodeChange<Node<ArchNodeData>>[]) => {
+    // Snapshot before deletions
+    if (changes.some((c) => c.type === "remove")) get().pushHistory();
     set({
       nodes: applyNodeChanges(changes, get().nodes),
     });
   },
 
   onEdgesChange: (changes: EdgeChange[]) => {
+    if (changes.some((c) => c.type === "remove")) get().pushHistory();
     set({
       edges: applyEdgeChanges(changes, get().edges),
     });
   },
 
   onConnect: (connection: Connection) => {
+    get().pushHistory();
     const nodes = get().nodes;
     const sourceNode = nodes.find((n) => n.id === connection.source);
     const targetNode = nodes.find((n) => n.id === connection.target);
@@ -66,14 +70,67 @@ export const createCanvasSlice: StateCreator<CanvasState, [], [], CanvasSlice> =
   },
 
   addNode: (node: Node<ArchNodeData>) => {
+    get().pushHistory();
     set({
       nodes: [...get().nodes, node],
     });
   },
 
   setCanvasState: (nodes, edges) => {
+    get().pushHistory();
+
+    const GROUP_KEYWORDS = [
+      "layer",
+      "engine",
+      "hub",
+      "zone",
+      "sink",
+      "transport",
+      "acquisition",
+      "medallion",
+      "transformation",
+      "observ",
+      "bronze",
+      "silver",
+      "gold",
+      "storage",
+    ];
+
+    const sanitizedNodes =
+      nodes?.map((node) => {
+        const labelStr = typeof node.data?.label === "string" ? node.data.label : "";
+        const labelLower = labelStr.toLowerCase();
+
+        // Treat as group if label matches known architectural layer keywords
+        const isGroup =
+          node.type === "archGroup" || GROUP_KEYWORDS.some((kw) => labelLower.includes(kw));
+
+        const type = isGroup ? "archGroup" : "intentNode";
+        const intentProperties = isGroup
+          ? {}
+          : {
+              ...getDefaultProperties(labelStr),
+              ...node.data?.intentProperties,
+            };
+
+        return {
+          ...node,
+          type,
+          data: {
+            ...node.data,
+            intentProperties,
+          },
+        };
+      }) || [];
+
+    // Put archGroup nodes first so React Flow can resolve parent references
+    const sorted = [
+      ...sanitizedNodes.filter((n) => n.type === "archGroup"),
+      ...sanitizedNodes.filter((n) => n.type !== "archGroup"),
+    ];
+
     set({
-      nodes: nodes || [],
+      nodes: sorted,
       edges: edges || [],
     });
   },

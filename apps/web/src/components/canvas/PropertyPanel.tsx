@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useOnSelectionChange } from "@xyflow/react";
 import type { Node } from "@xyflow/react";
 import { useCanvasStore } from "../../store/useCanvasStore";
-import type { ArchNodeData, IntentProperty } from "@archcanvas/shared";
+import type { ArchNodeData } from "@archcanvas/shared";
 import { ChevronLeft, ChevronRight, Settings2, X, Info } from "lucide-react";
+import { NODE_SCHEMAS } from "../../config/nodeSchemas";
 
 interface PropertyPanelProps {
   forceOpen?: boolean;
@@ -29,7 +30,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
     },
   });
 
-  const onPropertyChange = (prop: IntentProperty, value: string) => {
+  const onPropertyChange = (prop: string, value: string) => {
     if (!selectedNode) return;
     updateNodeData(selectedNode.id, {
       intentProperties: {
@@ -47,7 +48,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
     return getOptionsForProp(prop);
   };
 
-  const getAttributeType = (prop: string): "select" | "text" => {
+  const getAttributeType = (prop: string): "text" | "number" | "select" | "boolean" => {
     if (selectedTemplate) {
       const attr = selectedTemplate.attributes.find((a) => a.name === prop);
       return attr?.type || "select";
@@ -140,59 +141,59 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ forceOpen }) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-thin scrollbar-thumb-[var(--color-border)]">
-              {(
-                Object.entries(selectedNode.data.intentProperties) as [IntentProperty, string][]
-              ).map(([prop, value]) => (
-                <div key={prop} className="flex flex-col gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-[var(--color-text-secondary)] flex items-center justify-between uppercase tracking-wider">
-                      <div className="flex items-center gap-2">
-                        {getLabel(prop)}
-                        {getDescription(prop) && (
-                          <div className="group/tooltip relative inline-block">
-                            <Info
-                              size={12}
-                              className="text-tech-accent/40 hover:text-tech-accent transition-colors cursor-help"
-                            />
-                            <div className="absolute left-0 bottom-full mb-2 w-48 p-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded shadow-2xl text-[10px] text-[var(--color-text-primary)] leading-relaxed opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-all z-50 normal-case font-medium">
-                              {getDescription(prop)}
-                              <div className="absolute left-2 top-full border-4 border-transparent border-t-[var(--color-border)]"></div>
+              {(Object.entries(selectedNode.data.intentProperties) as [string, string][]).map(
+                ([prop, value]) => (
+                  <div key={prop} className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-[var(--color-text-secondary)] flex items-center justify-between uppercase tracking-wider">
+                        <div className="flex items-center gap-2">
+                          {getLabel(prop)}
+                          {getDescription(prop) && (
+                            <div className="group/tooltip relative inline-block">
+                              <Info
+                                size={12}
+                                className="text-tech-accent/40 hover:text-tech-accent transition-colors cursor-help"
+                              />
+                              <div className="absolute left-0 bottom-full mb-2 w-48 p-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded shadow-2xl text-[10px] text-[var(--color-text-primary)] leading-relaxed opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-all z-50 normal-case font-medium">
+                                {getDescription(prop)}
+                                <div className="absolute left-2 top-full border-4 border-transparent border-t-[var(--color-border)]"></div>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-[9px] px-1.5 py-0.5 bg-[var(--color-bg-primary)] rounded border border-[var(--color-border)] text-tech-accent font-mono">
-                        {selectedTemplate ? "CUSTOM" : "INTENT"}
-                      </span>
-                    </label>
-                  </div>
-
-                  {getAttributeType(prop) === "select" ? (
-                    <div className="grid grid-cols-1 gap-1.5">
-                      {getOptions(prop).map((opt) => (
-                        <button
-                          key={opt}
-                          onClick={() => onPropertyChange(prop, opt)}
-                          className={`py-2 text-[10px] font-bold rounded border transition-all uppercase tracking-widest ${
-                            value === opt
-                              ? "bg-tech-accent border-tech-accent text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]"
-                              : "bg-[var(--color-bg-primary)]/40 border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-tech-accent/50"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
+                          )}
+                        </div>
+                        <span className="text-[9px] px-1.5 py-0.5 bg-[var(--color-bg-primary)] rounded border border-[var(--color-border)] text-tech-accent font-mono">
+                          {selectedTemplate ? "CUSTOM" : "INTENT"}
+                        </span>
+                      </label>
                     </div>
-                  ) : (
-                    <input
-                      type="text"
-                      value={value}
-                      onChange={(e) => onPropertyChange(prop, e.target.value)}
-                      className="w-full bg-[var(--color-bg-primary)]/40 border border-[var(--color-border)] rounded py-2 px-3 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-tech-accent/50 transition-all"
-                    />
-                  )}
-                </div>
-              ))}
+
+                    {getAttributeType(prop) === "select" ? (
+                      <div className="grid grid-cols-1 gap-1.5">
+                        {getOptions(prop).map((opt) => (
+                          <button
+                            key={opt}
+                            onClick={() => onPropertyChange(prop, opt)}
+                            className={`py-2 text-[10px] font-bold rounded border transition-all uppercase tracking-widest ${
+                              value === opt
+                                ? "bg-tech-accent border-tech-accent text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]"
+                                : "bg-[var(--color-bg-primary)]/40 border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-tech-accent/50"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <input
+                        type="text"
+                        value={value}
+                        onChange={(e) => onPropertyChange(prop, e.target.value)}
+                        className="w-full bg-[var(--color-bg-primary)]/40 border border-[var(--color-border)] rounded py-2 px-3 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-tech-accent/50 transition-all"
+                      />
+                    )}
+                  </div>
+                ),
+              )}
 
               <div className="pt-6 border-t border-[var(--color-border)] opacity-50">
                 <h4 className="text-[10px] font-bold text-[var(--color-text-secondary)] uppercase mb-3 tracking-widest">
