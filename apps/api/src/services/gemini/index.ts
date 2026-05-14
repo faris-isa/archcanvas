@@ -175,11 +175,21 @@ export const chatWithGemini = async (request: ChatRequest): Promise<ChatResponse
         
         CANVAS UPDATES:
         If you want to suggest a new set of nodes and edges, append a JSON block at the END of your message wrapped in <canvas_update> tags.
+        CRITICAL: Every node MUST include a "category" string and an "intentProperties" object. If you omit these, the frontend will crash.
         Format:
         <canvas_update>
         {
           "nodes": [
-            { "id": "node-1", "type": "intentNode", "data": { "label": "PLC", "category": "Edge & Sources", "intentProperties": {} }, "position": { "x": 0, "y": 0 } }
+            { 
+              "id": "node-1", 
+              "type": "intentNode", 
+              "data": { 
+                "label": "PLC", 
+                "category": "Edge & Sources", 
+                "intentProperties": {} 
+              }, 
+              "position": { "x": 0, "y": 0 } 
+            }
           ],
           "edges": [
             { "id": "edge-1", "source": "node-1", "target": "node-2" }
