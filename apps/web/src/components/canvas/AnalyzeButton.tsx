@@ -18,7 +18,7 @@ export const AnalyzeButton: React.FC = () => {
     apiClient
       .getHealth()
       .then((data) => setMockMode(!!data.mockMode))
-      .catch(() => setMockMode(true));
+      .catch(() => setMockMode(false)); // network failure ≠ mock mode; don't show false positive
   }, []);
 
   const onAnalyze = async () => {

@@ -37,7 +37,7 @@ steps:
       - "-c"
       - |
         API_URL=$(cat /workspace/api_url.txt)
-        docker build -t gcr.io/$PROJECT_ID/arch-web -f apps/web/Dockerfile --build-arg VITE_API_URL=$$API_URL .
+        docker build -t gcr.io/$PROJECT_ID/arch-web -f apps/web/Dockerfile --build-arg VITE_API_URL=$API_URL .
   - name: "gcr.io/cloud-builders/docker"
     args: ["push", "gcr.io/$PROJECT_ID/arch-web"]
 
