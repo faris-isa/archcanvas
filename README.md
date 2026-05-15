@@ -22,7 +22,6 @@ ArchCanvas is a powerful visual tool that simplifies building data pipelines usi
 - Hono (Node Server)
 - Firebase Admin & Firestore for persistence
 - Google GenAI & Vertex AI SDKs for AI recommendations
-- Drizzle ORM & SQLite (for local caching/storage)
 
 **Workspace:**
 
