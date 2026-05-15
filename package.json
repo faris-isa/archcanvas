@@ -1,8 +1,14 @@
 {
   "name": "juara-vibe-coding",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
+  "description": "Intent-driven data pipeline architecting tool with React Flow canvas, Gemini AI recommendations, and Firebase persistence. #juaravibecoding",
+  "keywords": [
+    "archcanvas",
+    "firebase",
+    "gemini-ai",
+    "juaravibecoding",
+    "react-flow"
+  ],
   "homepage": "https://github.com/faris-isa/archcanvas#readme",
   "bugs": {
     "url": "https://github.com/faris-isa/archcanvas/issues"
