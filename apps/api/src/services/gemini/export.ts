@@ -17,10 +17,10 @@ export const exportArchitectureReport = async (request: AnalyzeRequest): Promise
         Nodes: ${JSON.stringify(request.nodes)}
         Edges: ${JSON.stringify(request.edges)}
         
-        Please provide a professional, beautiful, and modern HTML document (with inline CSS or a simple style tag using a clean, dark-mode inspired theme) that includes:
-        1. A comprehensive analysis of the Pros and Cons of this current architecture.
-        2. Suggestions for improving it, including specific new nodes or missing components.
-        3. Explain how these new nodes would fit into the canvas.
+        Please provide a professional, beautiful, and modern HTML document (with inline CSS or a simple style tag using a clean, dark-mode inspired theme, but with a @media print block so it prints well as a PDF) that includes:
+        1. A "Current Architecture" section that clearly lists all existing nodes and their core properties so the user has a full record of the canvas.
+        2. A comprehensive analysis of the Pros and Cons of this current architecture.
+        3. "Node Suggestions & Upgrades": When suggesting modifications or new nodes, explicitly show a "Before vs. After" comparison (e.g., showing the partial architecture before the update, and how it connects after the update).
 
         IMPORTANT: Return ONLY valid HTML (starting with <!DOCTYPE html> and ending with </html>). Do not include markdown code block formatting (like \`\`\`html) around your response. Use a modern, responsive design.
       `;
