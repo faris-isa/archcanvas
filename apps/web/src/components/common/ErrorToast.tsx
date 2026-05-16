@@ -21,7 +21,7 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
 
   return (
     <div
-      className="flex items-start gap-3 p-3 rounded-lg border text-[11px] leading-relaxed animate-fade-in"
+      className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-start gap-3 p-4 rounded-lg border shadow-2xl min-w-[320px] max-w-[450px] backdrop-blur-md text-[13px] leading-relaxed animate-fade-in"
       style={{
         background: "rgba(239, 68, 68, 0.08)",
         borderColor: "rgba(239, 68, 68, 0.3)",
