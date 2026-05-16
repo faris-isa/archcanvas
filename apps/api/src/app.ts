@@ -6,6 +6,7 @@ import pipelines from "./routes/pipelines";
 import analyze from "./routes/analyze";
 import diagnostic from "./routes/diagnostic";
 import chat from "./routes/chat";
+import exportRoute from "./routes/export";
 
 const app = new Hono();
 
@@ -19,6 +20,7 @@ app.route("/api/pipelines", pipelines);
 app.route("/api/analyze-architecture", analyze);
 app.route("/api/chat", chat);
 app.route("/api/diagnostic", diagnostic);
+app.route("/api/export-architecture", exportRoute);
 
 // Error handling
 app.onError((err, c) => {

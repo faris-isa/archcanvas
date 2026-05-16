@@ -2,6 +2,7 @@ import { ModelSelector } from "../canvas/ModelSelector";
 import React from "react";
 import { NodeLibrary } from "../sidebar/NodeLibrary";
 import { AnalyzeButton } from "../canvas/AnalyzeButton";
+import { ExportButton } from "../canvas/ExportButton";
 import { SaveButton } from "../canvas/SaveButton";
 import { UnifiedSidebar } from "../sidebar/UnifiedSidebar";
 import { useCanvasStore } from "../../store/useCanvasStore";
@@ -159,6 +160,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </div>
             <ModelSelector />
             <AnalyzeButton />
+            <ExportButton />
             <SaveButton />
           </div>
         </header>
