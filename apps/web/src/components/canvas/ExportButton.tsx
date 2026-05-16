@@ -14,6 +14,36 @@ export const ExportButton: React.FC = () => {
   const onExport = async () => {
     if (nodes.length === 0) return;
 
+    // Open tab synchronously to prevent popup blocker
+    const newTab = window.open("", "_blank");
+    if (!newTab) {
+      setError("Popup blocked. Please allow popups for this site.");
+      return;
+    }
+
+    newTab.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Generating Report...</title>
+        <style>
+          body { background: #1a1a2e; color: #a855f7; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+          .loader { border: 4px solid #ffffff33; border-top: 4px solid #a855f7; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+          .container { display: flex; flex-direction: column; align-items: center; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="loader"></div>
+          <h2>Analyzing Architecture...</h2>
+          <p>Please wait while Gemini generates your report.</p>
+        </div>
+      </body>
+      </html>
+    `);
+    newTab.document.close();
+
     setLoading(true);
     try {
       const request: AnalyzeRequest = {
@@ -34,16 +64,14 @@ export const ExportButton: React.FC = () => {
 
       const htmlContent = await apiClient.exportArchitecture(request);
 
-      const newTab = window.open("", "_blank");
-      if (newTab) {
-        newTab.document.write(htmlContent);
-        newTab.document.close();
-      } else {
-        setError("Popup blocked. Please allow popups for this site.");
-      }
+      // Overwrite the loading screen with the actual report
+      newTab.document.open();
+      newTab.document.write(htmlContent);
+      newTab.document.close();
     } catch (err: any) {
       console.error("Export error:", err);
       setError(err.message || "Failed to generate report");
+      newTab.close(); // Close the loading tab on error
     } finally {
       setLoading(false);
     }
