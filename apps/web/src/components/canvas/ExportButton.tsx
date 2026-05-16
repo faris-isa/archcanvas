@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCanvasStore } from "../../store/useCanvasStore";
 import { apiClient } from "../../api/client";
 import { ErrorToast } from "../common/ErrorToast";
 import type { AnalyzeRequest } from "@archcanvas/shared";
 import { Download } from "lucide-react";
+import { Shortcut } from "../common/Shortcut";
 
 export const ExportButton: React.FC = () => {
   const { nodes, edges, selectedModel } = useCanvasStore();
@@ -48,13 +49,32 @@ export const ExportButton: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Don't intercept shortcuts when the user is typing in an input/textarea
+      const target = event.target as HTMLElement;
+      const isTyping =
+        target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
+
+      if (!isTyping && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "e") {
+        event.preventDefault();
+        if (!loading && nodes.length > 0) {
+          onExport();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [loading, nodes, edges]);
+
   return (
     <>
       <button
         onClick={onExport}
         disabled={loading || nodes.length === 0}
-        title="Export Architecture Report"
-        className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm font-bold transition-all duration-300 ${
+        title="Shortcut: Ctrl + E"
+        className={`group relative flex items-center gap-2 px-3 py-1.5 rounded text-sm font-bold transition-all duration-300 ${
           loading || nodes.length === 0
             ? "bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] opacity-50 cursor-not-allowed border border-[var(--color-border)]"
             : "bg-purple-600 text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
@@ -62,6 +82,15 @@ export const ExportButton: React.FC = () => {
       >
         <Download size={16} />
         {loading ? "Exporting..." : "Export"}
+        {!loading && (
+          <Shortcut
+            keys={["Ctrl", "E"]}
+            className="opacity-50 group-hover:opacity-100 transition-opacity"
+          />
+        )}
+        {!loading && nodes.length > 0 && (
+          <div className="absolute inset-0 rounded bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+        )}
       </button>
 
       {error && (
