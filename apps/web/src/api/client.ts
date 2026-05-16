@@ -41,6 +41,20 @@ export const apiClient = {
     return handleResponse<ChatResponse>(res);
   },
 
+  async exportArchitecture(request: AnalyzeRequest): Promise<string> {
+    const res = await fetch(`${BASE_URL}/api/export-architecture`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Export failed: ${res.statusText}`);
+    }
+
+    return res.text();
+  },
+
   async listPipelines(): Promise<PipelineSummary[]> {
     const res = await fetch(`${BASE_URL}/api/pipelines`);
     return handleResponse<PipelineSummary[]>(res);
